@@ -14,6 +14,6 @@ class Product(db.Model):
         return {    
             "id": self.id,
             "product": self.product,
-            "added_at": self.date.iso_format(),
-            "last_change": self.date.iso_format()
+            "added_at": self.added_at.iso_format(),
+            "last_change": self.last_change.iso_format()
         }

@@ -3,6 +3,9 @@ from app.utils.validators import is_valid_email, is_valid_full_name, is_valid_pa
 from app.models.user_model import User
 
 def validate_register_user(data):
+    if not data: 
+        raise ValidationError("Missing data")
+    
     user_name = data.get('name')
     user_email = data.get('email')
     user_password = data.get('password')

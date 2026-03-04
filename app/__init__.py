@@ -56,7 +56,7 @@ def create_app():
             user_id = get_jwt_identity()
             
             if user_id:
-                update_last_access(user_id)
+                update_last_access(int(user_id))
         except Exception:
             pass
    
