@@ -28,7 +28,7 @@ def validate_price_fields(fields):
     if not fields:
         return list(ALLOWED_FIELDS)
     
-    requested = [f.strip for f in fields.split(",")]
+    requested = [f.strip() for f in fields.split(",")]
 
     for fields in requested:
         if fields not in ALLOWED_FIELDS:
