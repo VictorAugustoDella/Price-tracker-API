@@ -6,18 +6,6 @@ from app.routes.price.price_validators import validate_price, validate_price_fie
 from app.services.price_stats import calculate_stats
 
 
-def calculate_average(product):
-    prices = [p.price for p in product.price_history]
-    if not prices:
-        return None
-    return sum(prices) / len(prices)
-
-def calculate_current(product):
-    prices = [p.price for p in product.price_history]
-    if not prices:
-        return None
-    return product.order_by(PriceHistory.collected_at.desc()).first()
-
 def view_product_prices_by_id_service(user_id: int, id: int):
     product = Product.query.filter_by(id=id, user_id=user_id).first()
     
