@@ -52,13 +52,10 @@ def create_app(database_uri=None):
     # update last access
     @app.before_request
     def update_user_activity():
-        try:
-            verify_jwt_in_request(optional=True)
-            user_id = get_jwt_identity()
+        verify_jwt_in_request(optional=True)
+        user_id = get_jwt_identity()
             
-            if user_id:
-                update_last_access(int(user_id))
-        except Exception:
-            pass
-   
+        if user_id:
+            update_last_access(int(user_id))
+            
     return app
