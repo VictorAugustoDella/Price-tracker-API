@@ -44,8 +44,10 @@ def product(app, user):
     
     with app.app_context():
         product = Product(
-            product='Peanut butter',
-            link='https://amazon.com.br/test-product',
+            product='Test Product',
+            url='https://amazon.com.br/test-product',
+            site='amazon',
+            scraped_name='scraped_name_example',
             user_id=user_obj.id)
         
         db.session.add(product)
@@ -73,8 +75,10 @@ def product_with_multiple_prices(app, user):
     user_obj, _ = user
     with app.app_context():
         product = Product(
-            product="Mouse Gamer",
-            link='https://amazon.com.br/test-product2',
+            product="Test Product2",
+            url='https://amazon.com.br/test-product2',
+            site='amazon',
+            scraped_name='scraped_name2',
             user_id=user_obj.id
         )
         db.session.add(product)
