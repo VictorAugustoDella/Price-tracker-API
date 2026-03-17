@@ -1,26 +1,23 @@
 from app.exceptions import ValidationError
 
-def _validate_price_format(price_format):
-    if price_format is None:
-        raise ValidationError("Price is required")
+def _validate_scraped_price(price):
+    if price is None:
+        raise ValidationError("Could not scrape product price")
     
-    if not isinstance(price_format, (int, float)):
-        raise ValidationError("Price must be a number")
-        
-    if price_format <= 0:
-        raise ValidationError("Price must be greater than 0")
-    
-    return float(price_format)
+    if isinstance(price, str):
+        price = price.replace(".", "").replace(",", ".")
 
-def validate_price(data):
-    if not data:  
-        raise ValidationError("Missing data")
-    
-    price = _validate_price_format(data.get("price"))
-    
-    return {
-        'price': price
-    }
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        raise ValidationError("Scraped price is invalid")
+
+    if price <= 0:
+        raise ValidationError("Scraped price must be greater than 0")
+
+    return price
+
+
     
 def validate_price_fields(fields):
     ALLOWED_FIELDS = {"current", "average", "lowest", "highest", "total", "variation_percent", "is_best_price", "last_30_days_average", "price_trend" }
