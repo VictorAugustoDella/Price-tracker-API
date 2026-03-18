@@ -9,7 +9,6 @@ def test_create_product_success(client, auth_header):
         headers=auth_header,
         json={
             "product": "Mouse Gamer",
-            "price": 120.50,
             "url": "https://www.amazon.com.br/BlenderBottle-SportMixer-Tritan-Shaker-Bottle/dp/B07GCMM2RR/"
         }
     )
@@ -25,7 +24,6 @@ def test_create_product_missing_field(client, auth_header):
         headers=auth_header,
         json={
             "product": "Mouse Gamer",
-            "price": 120.50
         }
     )
     
@@ -40,7 +38,6 @@ def test_create_product_invalid_url(client, auth_header):
         headers=auth_header,
         json={
             "product": "Mouse Gamer",
-            "price": "invalid price",
             "url": "amazoncombr"
         }
     )
