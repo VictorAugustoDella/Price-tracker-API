@@ -3,13 +3,13 @@ def test_products_requires_auth(client):
 
     assert response.status_code == 401
     
-def test_create_product_success(client, auth_header):
+def test_create_product_success(client, auth_header, mock_scraper):
     response = client.post(
         "/api/v1/products",
         headers=auth_header,
         json={
             "product": "Mouse Gamer",
-            "url": "https://www.amazon.com.br/BlenderBottle-SportMixer-Tritan-Shaker-Bottle/dp/B07GCMM2RR/"
+            "url": "https://www.amazon.com.br/Mouse-Bot%C3%B5es-Design-Colmeia-Notebook/dp/B0FPP4D6L5/"
         }
     )
 

@@ -8,6 +8,7 @@ from app.db import db
 from app.models.price_history_model import PriceHistory
 from app.models.product_model import Product
 from app.models.user_model import User
+import app.services.product_service as product_service
 
 
 @pytest.fixture
@@ -17,7 +18,7 @@ def app():
     app = create_app(database_uri=test_db_url)
     app.config.update({
         "TESTING": True,
-        "JWT_SECRET_KEY": "test-secret",
+        "JWT_SECRET_KEY": "test-secret-key-with-at-least-32-bytes!!",
     })
     
     with app.app_context():
@@ -119,3 +120,16 @@ def second_user(app):
 def second_auth_header(second_user):
     _, token = second_user
     return {"Authorization": f"Bearer {token}"}
+
+
+
+@pytest.fixture
+def mock_scraper(monkeypatch):
+    def fake_scraper(url):
+        return Decimal("199.90"), "Produto Mockado"
+
+    def fake_get_scraper(url):
+        return fake_scraper, "amazon"
+
+    monkeypatch.setattr(product_service, "get_scraper", fake_get_scraper)
+    yield
