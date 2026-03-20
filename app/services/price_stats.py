@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from sqlalchemy import func
 from app.models.price_history_model import PriceHistory
 from app.db import db
@@ -19,7 +19,7 @@ def calculate_stats(prices_query, requested_fields):
     # CURRENT
     if "current" in requested_fields:
         latest_price = (
-            prices_query.order_by(PriceHistory.collected_at.desc())
+            prices_query.order_by(PriceHistory.collected_at.desc(), PriceHistory.id.desc())
             .with_entities(PriceHistory.price)
             .first()
         )
@@ -49,12 +49,12 @@ def calculate_stats(prices_query, requested_fields):
     # VARIATION_PERCENT
     if "variation_percent" in requested_fields:
         first_price = (
-            prices_query.order_by(PriceHistory.collected_at.asc())
+            prices_query.order_by(PriceHistory.collected_at.asc(), PriceHistory.id.asc())
             .with_entities(PriceHistory.price)
             .first()
         )
         latest_price = (
-            prices_query.order_by(PriceHistory.collected_at.desc())
+            prices_query.order_by(PriceHistory.collected_at.desc(), PriceHistory.id.desc())
             .with_entities(PriceHistory.price)
             .first()
         )
@@ -68,7 +68,7 @@ def calculate_stats(prices_query, requested_fields):
     # IS_BEST_PRICE
     if "is_best_price" in requested_fields and product_id:
         latest_price = (
-            prices_query.order_by(PriceHistory.collected_at.desc())
+            prices_query.order_by(PriceHistory.collected_at.desc(), PriceHistory.id.desc())
             .with_entities(PriceHistory.price)
             .first()
         )
@@ -81,7 +81,7 @@ def calculate_stats(prices_query, requested_fields):
 
     # LAST_30_DAYS_AVERAGE
     if "last_30_days_average" in requested_fields and product_id:
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
         last_30_avg = (
             db.session.query(func.avg(PriceHistory.price))
             .filter(
@@ -95,12 +95,12 @@ def calculate_stats(prices_query, requested_fields):
     # PRICE_TREND
     if "price_trend" in requested_fields:
         first_price = (
-            prices_query.order_by(PriceHistory.collected_at.asc())
+            prices_query.order_by(PriceHistory.collected_at.asc(), PriceHistory.id.asc())
             .with_entities(PriceHistory.price)
             .first()
         )
         latest_price = (
-            prices_query.order_by(PriceHistory.collected_at.desc())
+            prices_query.order_by(PriceHistory.collected_at.desc(), PriceHistory.id.desc())
             .with_entities(PriceHistory.price)
             .first()
         )
