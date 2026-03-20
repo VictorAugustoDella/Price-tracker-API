@@ -1,5 +1,5 @@
 from app.db import db
-from datetime import datetime
+from datetime import datetime, UTC
 
 class PriceHistory(db.Model):
     __tablename__ = 'price_history'
@@ -7,7 +7,7 @@ class PriceHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=False)
-    collected_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    collected_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     
     product = db.relationship(
     "Product",

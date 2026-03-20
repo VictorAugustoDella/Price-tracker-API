@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from app.models.user_model import User
 from app.db import db
 from app.validators.auth_validators import validate_register_user, validate_login_user
@@ -6,10 +6,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.exceptions import UnauthorizedError, ConflictError
 
 def update_last_access(user_id: int):
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
 
     if user:
-        user.last_access = datetime.utcnow()
+        user.last_access = datetime.now(UTC)
         db.session.commit()
 
 def register_user_service(data):

@@ -1,5 +1,5 @@
 from app.db import db
-from datetime import datetime
+from datetime import UTC, datetime
 
 class Product(db.Model):
     __tablename__= 'products'
@@ -14,8 +14,8 @@ class Product(db.Model):
     scraped_name = db.Column(db.String, nullable=False)
     site = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
-    added_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    last_change = db.Column(db.DateTime,default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    added_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    last_change = db.Column(db.DateTime,default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC), nullable=False)
     
     
     def to_dict(self):       
