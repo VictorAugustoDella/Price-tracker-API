@@ -1,0 +1,135 @@
+from decimal import Decimal
+
+from flask_jwt_extended import create_access_token
+import pytest
+from werkzeug.security import generate_password_hash
+from backend.app import create_app
+from backend.app.db import db
+from backend.app.models.price_history_model import PriceHistory
+from backend.app.models.product_model import Product
+from backend.app.models.user_model import User
+import backend.app.services.product_service as product_service
+
+
+@pytest.fixture
+def app():
+    test_db_url = ("sqlite:///:memory:")
+    
+    app = create_app(database_uri=test_db_url)
+    app.config.update({
+        "TESTING": True,
+        "JWT_SECRET_KEY": "test-secret-key-with-at-least-32-bytes!!",
+    })
+    
+    with app.app_context():
+        db.create_all()
+        yield app
+        db.session.remove()
+        db.drop_all()
+        
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+@pytest.fixture
+def user(app):
+    with app.app_context():
+        user = User(name='Victor Augusto', email='teste2fixture@gmail.com', password=generate_password_hash('Senhateste4321')) 
+        db.session.add(user)
+        db.session.commit()
+
+        token = create_access_token(identity=str(user.id))
+        yield user, token
+        
+@pytest.fixture
+def product(app, user):
+    user_obj, _ = user
+    
+    with app.app_context():
+        product = Product(
+            product='Test Product',
+            url='https://www.amazon.com.br/test-product',
+            site='amazon',
+            scraped_name='scraped_name_example',
+            user_id=user_obj.id)
+        
+        db.session.add(product)
+        db.session.commit()
+        db.session.refresh(product)  # garante id carregado
+        
+        price = PriceHistory(
+            product_id=product.id,
+            price=Decimal("43.50")
+        )
+        
+        db.session.add(price)
+        db.session.commit()
+        db.session.refresh(price)
+
+        yield product, price
+        
+@pytest.fixture
+def auth_header(user):
+    _, token = user
+    return {"Authorization": f"Bearer {token}"}
+
+@pytest.fixture
+def product_with_multiple_prices(app, user):
+    user_obj, _ = user
+    with app.app_context():
+        product = Product(
+            product="Test Product2",
+            url='https://www.amazon.com.br/test-product2',
+            site='amazon',
+            scraped_name='scraped_name2',
+            user_id=user_obj.id
+        )
+        db.session.add(product)
+        db.session.commit()
+        db.session.refresh(product)
+
+        prices = [
+            PriceHistory(product_id=product.id, price=Decimal("100.0")),
+            PriceHistory(product_id=product.id, price=Decimal("90.0")),
+            PriceHistory(product_id=product.id, price=Decimal("110.0")),
+        ]
+        db.session.add_all(prices)
+        db.session.commit()
+
+        for price in prices:
+            db.session.refresh(price)
+
+        yield product, prices
+        
+@pytest.fixture
+def second_user(app):
+    with app.app_context():
+        user = User(
+            name="Other User",
+            email="otheruser@gmail.com",
+            password=generate_password_hash("OtherPassword123")
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        token = create_access_token(identity=str(user.id))
+        yield user, token
+
+
+@pytest.fixture
+def second_auth_header(second_user):
+    _, token = second_user
+    return {"Authorization": f"Bearer {token}"}
+
+
+
+@pytest.fixture
+def mock_scraper(monkeypatch):
+    def fake_scraper(url):
+        return Decimal("199.90"), "Produto Mockado"
+
+    def fake_get_scraper(url):
+        return fake_scraper, "amazon"
+
+    monkeypatch.setattr(product_service, "get_scraper", fake_get_scraper)
+    yield

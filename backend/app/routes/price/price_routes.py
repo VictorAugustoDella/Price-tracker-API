@@ -1,0 +1,32 @@
+from flask import request, jsonify
+from backend.app.routes.price import price_bp
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from backend.app.services.price_service import view_product_prices_by_id_service, view_product_prices_stats_by_id_service, refresh_product_price_by_id_service
+
+@price_bp.route('/products/<int:id>/prices', methods=['GET'])
+@jwt_required()
+def view_product_prices_by_id(id):
+    user_id = int(get_jwt_identity())
+
+    prices = view_product_prices_by_id_service(user_id, id)
+    
+    return jsonify([p.to_dict() for p in prices]), 200
+
+@price_bp.route('/products/<int:id>/prices/stats', methods=['GET'])
+@jwt_required()
+def view_product_prices_stats_by_id(id):
+    user_id = int(get_jwt_identity())
+    fields = request.args.get('fields')
+    
+    stats = view_product_prices_stats_by_id_service(user_id, id, fields)
+    
+    return jsonify(stats)
+
+@price_bp.route('/products/<int:id>/prices/refresh', methods=['POST'])
+@jwt_required()
+def refresh_product_price_by_id(id):
+    user_id=int(get_jwt_identity())
+
+    new_price = refresh_product_price_by_id_service(user_id, id)
+
+    return jsonify(new_price.to_dict()), 201

@@ -1,0 +1,70 @@
+from flask import Flask, jsonify
+from backend.app.db import db
+from backend.app.routes.auth import auth_bp
+from backend.app.routes.product import product_bp
+from backend.app.routes.price import price_bp
+from os import getenv
+from flask_jwt_extended import JWTManager, get_jwt_identity
+from backend.app.models.user_model import User
+from backend.app.models.product_model import Product
+from backend.app.models.price_history_model import PriceHistory
+from backend.app.exceptions import ValidationError, NotFoundError, ConflictError, UnauthorizedError
+from flask_jwt_extended import verify_jwt_in_request
+from backend.app.services.user_service import update_last_access
+from flask_migrate import Migrate
+from werkzeug.exceptions import HTTPException
+
+migrate = Migrate()
+
+def create_app(database_uri=None):
+    app = Flask(__name__)
+    
+    app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'dev-secret-key')
+    app.config['JWT_SECRET_KEY'] = getenv('JWT_SECRET_KEY', 'dev-jwt-secret-key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
+    
+    db.init_app(app)
+    migrate.init_app(app, db)
+    
+    JWTManager(app)
+    
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(product_bp)
+    app.register_blueprint(price_bp)
+    
+    # Handlers de erro
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(e):
+        return jsonify({"error": str(e)}), 400
+    
+    @app.errorhandler(UnauthorizedError)
+    def handle_unauthorized_error(e):
+        return jsonify({"error": str(e)}), 401
+    
+    @app.errorhandler(NotFoundError)
+    def handle_not_found_error(e):
+        return jsonify({"error": str(e)}), 404
+
+    @app.errorhandler(ConflictError)
+    def handle_conflict_error(e):
+        return jsonify({"error": str(e)}), 409
+    
+    @app.errorhandler(Exception)
+    def handle_internal_error(e):
+        if isinstance(e, HTTPException):
+            return e
+
+        app.logger.exception("Unhandled exception: %s", e)
+        return jsonify({"error": "Internal server error"}), 500
+    
+    
+    # update last access
+    @app.before_request
+    def update_user_activity():
+        verify_jwt_in_request(optional=True)
+        user_id = get_jwt_identity()
+            
+        if user_id:
+            update_last_access(int(user_id))
+            
+    return app
