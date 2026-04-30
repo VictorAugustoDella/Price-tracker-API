@@ -1,11 +1,11 @@
-from backend.app.models.product_model import Product
-from backend.app.models.price_history_model import PriceHistory
-from backend.app.db import db
-from backend.app.exceptions import NotFoundError
-from backend.app.validators.price_validators import validate_price_fields
-from backend.app.services.price_stats import calculate_stats
-from backend.app.validators.price_validators import validate_scraped_price
-from backend.app.services.scrapers.scraper_resolver import get_scraper
+from app.models.product_model import Product
+from app.models.price_history_model import PriceHistory
+from app.db import db
+from app.exceptions import NotFoundError
+from app.validators.price_validators import validate_price_fields
+from app.services.price_stats import calculate_stats
+from app.validators.price_validators import validate_scraped_price
+from app.services.scrapers.scraper_resolver import get_scraper
 
 def view_product_prices_by_id_service(user_id: int, id: int):
     product = Product.query.filter_by(id=id, user_id=user_id).first()

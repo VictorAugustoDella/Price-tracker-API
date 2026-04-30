@@ -1,9 +1,9 @@
 from datetime import datetime, UTC
-from backend.app.models.user_model import User
-from backend.app.db import db
-from backend.app.validators.auth_validators import validate_register_user, validate_login_user
+from app.models.user_model import User
+from app.db import db
+from app.validators.auth_validators import validate_register_user, validate_login_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from backend.app.exceptions import UnauthorizedError, ConflictError
+from app.exceptions import UnauthorizedError, ConflictError
 
 def update_last_access(user_id: int):
     user = db.session.get(User, user_id)

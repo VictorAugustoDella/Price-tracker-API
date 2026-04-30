@@ -1,5 +1,5 @@
-from backend.app.exceptions import ValidationError
-from backend.app.utils.field_validators import is_valid_url
+from app.exceptions import ValidationError
+from app.utils.field_validators import is_valid_url
 
 def _validate_product_name(product_name):
     

@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
-from backend.app.exceptions import ValidationError
+from app.exceptions import ValidationError
 
 def amazon_scraper_price(link):
     with sync_playwright() as pw:

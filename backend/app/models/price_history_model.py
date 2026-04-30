@@ -1,4 +1,4 @@
-from backend.app.db import db
+from app.db import db
 from datetime import datetime, UTC
 
 class PriceHistory(db.Model):

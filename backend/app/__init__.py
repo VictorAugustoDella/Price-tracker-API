@@ -1,16 +1,16 @@
 from flask import Flask, jsonify
-from backend.app.db import db
-from backend.app.routes.auth import auth_bp
-from backend.app.routes.product import product_bp
-from backend.app.routes.price import price_bp
+from app.db import db
+from app.routes.auth import auth_bp
+from app.routes.product import product_bp
+from app.routes.price import price_bp
 from os import getenv
 from flask_jwt_extended import JWTManager, get_jwt_identity
-from backend.app.models.user_model import User
-from backend.app.models.product_model import Product
-from backend.app.models.price_history_model import PriceHistory
-from backend.app.exceptions import ValidationError, NotFoundError, ConflictError, UnauthorizedError
+from app.models.user_model import User
+from app.models.product_model import Product
+from app.models.price_history_model import PriceHistory
+from app.exceptions import ValidationError, NotFoundError, ConflictError, UnauthorizedError
 from flask_jwt_extended import verify_jwt_in_request
-from backend.app.services.user_service import update_last_access
+from app.services.user_service import update_last_access
 from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 

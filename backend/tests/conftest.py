@@ -3,12 +3,12 @@ from decimal import Decimal
 from flask_jwt_extended import create_access_token
 import pytest
 from werkzeug.security import generate_password_hash
-from backend.app import create_app
-from backend.app.db import db
-from backend.app.models.price_history_model import PriceHistory
-from backend.app.models.product_model import Product
-from backend.app.models.user_model import User
-import backend.app.services.product_service as product_service
+from app import create_app
+from app.db import db
+from app.models.price_history_model import PriceHistory
+from app.models.product_model import Product
+from app.models.user_model import User
+import app.services.product_service as product_service
 
 
 @pytest.fixture

@@ -1,5 +1,5 @@
-from backend.app.exceptions import ValidationError, ConflictError
-from backend.app.utils.field_validators import is_valid_email, is_valid_full_name, is_valid_password
+from app.exceptions import ValidationError, ConflictError
+from app.utils.field_validators import is_valid_email, is_valid_full_name, is_valid_password
 
 def validate_register_user(data):
     if not data: 

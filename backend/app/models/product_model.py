@@ -1,4 +1,4 @@
-from backend.app.db import db
+from app.db import db
 from datetime import UTC, datetime
 
 class Product(db.Model):

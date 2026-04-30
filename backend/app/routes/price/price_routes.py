@@ -1,7 +1,7 @@
 from flask import request, jsonify
-from backend.app.routes.price import price_bp
+from app.routes.price import price_bp
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from backend.app.services.price_service import view_product_prices_by_id_service, view_product_prices_stats_by_id_service, refresh_product_price_by_id_service
+from app.services.price_service import view_product_prices_by_id_service, view_product_prices_stats_by_id_service, refresh_product_price_by_id_service
 
 @price_bp.route('/products/<int:id>/prices', methods=['GET'])
 @jwt_required()

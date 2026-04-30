@@ -1,7 +1,7 @@
 from flask import request, jsonify
-from backend.app.routes.product import product_bp
+from app.routes.product import product_bp
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from backend.app.services.product_service import view_products_service, view_product_by_id_service, create_product_service, edit_product_service, delete_product_service
+from app.services.product_service import view_products_service, view_product_by_id_service, create_product_service, edit_product_service, delete_product_service
 
 @product_bp.route('/products', methods=['GET'])
 @jwt_required()

@@ -1,6 +1,6 @@
 from decimal import Decimal, InvalidOperation
 
-from backend.app.exceptions import ValidationError
+from app.exceptions import ValidationError
 
 def validate_scraped_price(price):
     if price is None:

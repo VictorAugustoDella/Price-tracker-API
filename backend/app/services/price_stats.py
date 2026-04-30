@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, UTC
 from sqlalchemy import func
-from backend.app.models.price_history_model import PriceHistory
-from backend.app.db import db
+from app.models.price_history_model import PriceHistory
+from app.db import db
 
 
 def to_number(value):

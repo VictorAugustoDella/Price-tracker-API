@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
-from backend.app.exceptions import ValidationError
-from backend.app.services.scrapers.amazon_playwright import amazon_scraper_price
-from backend.app.services.scrapers.mercado_livre_playwright import ml_scraper_price
+from app.exceptions import ValidationError
+from app.services.scrapers.amazon_playwright import amazon_scraper_price
+from app.services.scrapers.mercado_livre_playwright import ml_scraper_price
 
 
 def get_scraper(url: str):
