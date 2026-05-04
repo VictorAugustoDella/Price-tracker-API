@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from app.db import db
 from app.routes.auth import auth_bp
 from app.routes.product import product_bp
@@ -13,11 +13,19 @@ from flask_jwt_extended import verify_jwt_in_request
 from app.services.user_service import update_last_access
 from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
+from flask_cors import CORS
 
 migrate = Migrate()
 
 def create_app(database_uri=None):
     app = Flask(__name__)
+    
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
     
     app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'dev-secret-key')
     app.config['JWT_SECRET_KEY'] = getenv('JWT_SECRET_KEY', 'dev-jwt-secret-key')
@@ -61,6 +69,9 @@ def create_app(database_uri=None):
     # update last access
     @app.before_request
     def update_user_activity():
+        if request.method == "OPTIONS":
+            return None
+        
         verify_jwt_in_request(optional=True)
         user_id = get_jwt_identity()
             
