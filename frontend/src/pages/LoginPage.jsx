@@ -30,7 +30,7 @@ function LoginPage() {
     <main>
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
+          type="email"
           value={email}
           placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
@@ -43,7 +43,9 @@ function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" disabled={loading}>{loading ? "Entrando..." : "Login"}</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Entrando..." : "Login"}
+        </button>
       </form>
       {error && <p>{error}</p>}
     </main>
