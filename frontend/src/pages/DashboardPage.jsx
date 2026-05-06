@@ -1,4 +1,8 @@
-import { getProducts, createProduct } from "../services/productService";
+import {
+  getProducts,
+  createProduct,
+  deleteProduct,
+} from "../services/productService";
 import { useEffect, useState } from "react";
 
 function DashboardPage() {
@@ -35,6 +39,23 @@ function DashboardPage() {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function handleDeleteProduct(id) {
+    const confirmed = confirm("Tem certeza que deseja excluir este produto?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    setError(null);
+
+    try {
+      await deleteProduct(id);
+      await fetchProducts();
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -77,6 +98,9 @@ function DashboardPage() {
             </a>
             <p>Adicionado as: {item.added_at}</p>
             <p>Última mudança: {item.last_change}</p>
+            <button type="button" onClick={() => handleDeleteProduct(item.id)}>
+              Remover
+            </button>
           </li>
         ))}
       </ul>
