@@ -2,6 +2,7 @@ import {
   getProducts,
   createProduct,
   deleteProduct,
+  updateProduct,
 } from "../services/productService";
 import { useEffect, useState } from "react";
 
@@ -59,6 +60,28 @@ function DashboardPage() {
     }
   }
 
+  async function handleUpdateProduct(id, currentName) {
+    const newName = prompt("Digite o novo nome do produto:", currentName);
+
+    if (newName === null) {
+      return;
+    }
+
+    if (newName.trim() === "") {
+      setError("O nome do produto não pode ficar vazio");
+      return;
+    }
+
+    setError(null);
+
+    try {
+      await updateProduct(id, newName.trim());
+      await fetchProducts();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -100,6 +123,12 @@ function DashboardPage() {
             <p>Última mudança: {item.last_change}</p>
             <button type="button" onClick={() => handleDeleteProduct(item.id)}>
               Remover
+            </button>
+            <button
+              type="button"
+              onClick={() => handleUpdateProduct(item.id, item.product)}
+            >
+              Editar nome
             </button>
           </li>
         ))}

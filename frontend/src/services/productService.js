@@ -44,8 +44,27 @@ export async function deleteProduct(id) {
   });
 
   if (!response.ok) {
-    const data = await response.json()
+    const data = await response.json();
     throw new Error(data.error || "Erro desconhecido ao remover produto");
   }
+}
 
+export async function updateProduct(id, product) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ product }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Erro desconhecido ao editar produto");
+  }
+
+  return data;
 }
