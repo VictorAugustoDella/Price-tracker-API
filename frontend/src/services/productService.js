@@ -68,3 +68,23 @@ export async function updateProduct(id, product) {
 
   return data;
 }
+
+export async function getProductById(id) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || "Erro desconhecido ao acessar detalhes do produto",
+    );
+  }
+
+  return data;
+}
