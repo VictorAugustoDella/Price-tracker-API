@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { getProductById } from "../services/productService";
 import { useState, useEffect } from "react";
 import { getProductPrices, getProductStats } from "../services/priceService";
+import { formatPrice, formatDate } from "../utils/formatters";
 
 function ProductDetailsPage() {
   const [product, setProduct] = useState(null);
@@ -46,8 +47,8 @@ function ProductDetailsPage() {
         <a href={product.url} target="_blank" rel="noreferrer">
           Abrir produto na loja
         </a>
-        <p>Adicionado em: {product.added_at}</p>
-        <p>Última mudança: {product.last_change}</p>
+        <p>Adicionado em: {formatDate(product.added_at)}</p>
+        <p>Última mudança: {formatDate(product.last_change)}</p>
       </div>
       <div>
         <h2>Histórico de preços</h2>
@@ -58,8 +59,8 @@ function ProductDetailsPage() {
           <ul>
             {prices.map((item) => (
               <li key={item.id}>
-                <p>Preço: R${item.price}</p>
-                <p>Coletado em: {item.collected_at}</p>
+                <p>Preço: {formatPrice(item.price)}</p>
+                <p>Coletado em: {formatDate(item.collected_at)}</p>
               </li>
             ))}
           </ul>
@@ -68,10 +69,10 @@ function ProductDetailsPage() {
       <div>
         <h2>Estatísticas</h2>
 
-        <p>Preço atual: R${stats.current}</p>
-        <p>Menor preço: R${stats.lowest}</p>
-        <p>Maior preço: R${stats.highest}</p>
-        <p>Preço médio: R${stats.average}</p>
+        <p>Preço atual: {formatPrice(stats.current)}</p>
+        <p>Menor preço: {formatPrice(stats.lowest)}</p>
+        <p>Maior preço: {formatPrice(stats.highest)}</p>
+        <p>Preço médio: {formatPrice(stats.average)}</p>
         <p>Quantidade de coletas: {stats.total}</p>
         <p>Variação: {stats.variation_percent}%</p>
         <p>Melhor preço: {stats.is_best_price ? "Sim" : "Não"}</p>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { formatDate } from "../../utils/formatters";
 
 function ProductCard({ product, onDelete, onUpdate }) {
   return (
@@ -11,8 +12,8 @@ function ProductCard({ product, onDelete, onUpdate }) {
         Abrir produto
       </a>
 
-      <p>Adicionado as: {product.added_at}</p>
-      <p>Última mudança: {product.last_change}</p>
+      <p>Adicionado as: {formatDate(product.added_at)}</p>
+      <p>Última mudança: {formatDate(product.last_change)}</p>
 
       <button type="button" onClick={() => onDelete(product.id)}>
         Remover
