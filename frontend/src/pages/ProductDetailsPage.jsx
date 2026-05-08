@@ -1,13 +1,14 @@
 import { useParams } from "react-router-dom";
 import { getProductById } from "../services/productService";
 import { useState, useEffect } from "react";
-import { getProductPrices } from "../services/priceService";
+import { getProductPrices, getProductStats } from "../services/priceService";
 
 function ProductDetailsPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [prices, setPrices] = useState([]);
+  const [stats, setStats] = useState(null);
 
   const { id } = useParams();
 
@@ -16,8 +17,10 @@ function ProductDetailsPage() {
       try {
         const productData = await getProductById(id);
         const priceData = await getProductPrices(id);
+        const statsData = await getProductStats(id);
         setProduct(productData);
         setPrices(priceData);
+        setStats(statsData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -61,6 +64,18 @@ function ProductDetailsPage() {
             ))}
           </ul>
         )}
+      </div>
+      <div>
+        <h2>Estatísticas</h2>
+
+        <p>Preço atual: R${stats.current}</p>
+        <p>Menor preço: R${stats.lowest}</p>
+        <p>Maior preço: R${stats.highest}</p>
+        <p>Preço médio: R${stats.average}</p>
+        <p>Quantidade de coletas: {stats.total}</p>
+        <p>Variação: {stats.variation_percent}%</p>
+        <p>Melhor preço: {stats.is_best_price ? "Sim" : "Não"}</p>
+        <p>Tendência: {stats.price_trend}</p>
       </div>
     </main>
   );
