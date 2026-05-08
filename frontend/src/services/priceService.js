@@ -22,10 +22,13 @@ export async function getProductPrices(productId) {
 
 export async function getProductStats(productId) {
   const token = localStorage.getItem("token");
-  const response = await fetch(`http://localhost:5000/api/v1/products/${productId}/prices/stats`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(
+    `http://localhost:5000/api/v1/products/${productId}/prices/stats`,
+    {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
 
   const data = await response.json();
 
@@ -33,6 +36,25 @@ export async function getProductStats(productId) {
     throw new Error(
       data.error || "Error desconhecido ao buscar estatísticas do produto",
     );
+  }
+
+  return data;
+}
+
+export async function refreshProductPrice(productId) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    `http://localhost:5000/api/v1/products/${productId}/prices/refresh`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Erro desconhecido ao atualizar preço");
   }
 
   return data;

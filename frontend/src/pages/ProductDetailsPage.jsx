@@ -1,7 +1,11 @@
 import { useParams } from "react-router-dom";
 import { getProductById } from "../services/productService";
 import { useState, useEffect } from "react";
-import { getProductPrices, getProductStats } from "../services/priceService";
+import {
+  getProductPrices,
+  getProductStats,
+  refreshProductPrice,
+} from "../services/priceService";
 import { formatPrice, formatDate } from "../utils/formatters";
 
 function ProductDetailsPage() {
@@ -10,18 +14,23 @@ function ProductDetailsPage() {
   const [error, setError] = useState(null);
   const [prices, setPrices] = useState([]);
   const [stats, setStats] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { id } = useParams();
+
+  async function fetchProductDetails() {
+    const productData = await getProductById(id);
+    const priceData = await getProductPrices(id);
+    const statsData = await getProductStats(id);
+    setProduct(productData);
+    setPrices(priceData);
+    setStats(statsData);
+  }
 
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const productData = await getProductById(id);
-        const priceData = await getProductPrices(id);
-        const statsData = await getProductStats(id);
-        setProduct(productData);
-        setPrices(priceData);
-        setStats(statsData);
+        await fetchProductDetails();
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,6 +40,19 @@ function ProductDetailsPage() {
 
     fetchProduct();
   }, [id]);
+
+  async function handleRefreshPrice() {
+    setError(null);
+    setRefreshing(true);
+    try {
+      await refreshProductPrice(id);
+      await fetchProductDetails();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   if (loading) return <h1>Carregando produto...</h1>;
 
@@ -49,6 +71,9 @@ function ProductDetailsPage() {
         </a>
         <p>Adicionado em: {formatDate(product.added_at)}</p>
         <p>Última mudança: {formatDate(product.last_change)}</p>
+        <button onClick={handleRefreshPrice} disabled={refreshing}>
+          {refreshing ? "Atualizando preço..." : "Atualizar preço"}
+        </button>
       </div>
       <div>
         <h2>Histórico de preços</h2>
