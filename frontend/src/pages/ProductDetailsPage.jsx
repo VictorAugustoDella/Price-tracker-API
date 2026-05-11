@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { formatPrice, formatDate } from "../utils/formatters";
 import { useProductDetails } from "../hooks/useProductDetails";
 import ProductInfo from "../components/products/ProductInfo";
+import PriceHistory from "../components/products/PriceHistory";
+
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -65,22 +67,9 @@ function ProductDetailsPage() {
     <main>
       <ProductInfo product={product} refreshing={refreshing} onRefresh={handleRefreshPrice}/>
 
-      <div>
-        <h2>Histórico de preços</h2>
+      <PriceHistory prices={prices}/>
 
-        {prices.length === 0 ? (
-          <p>Nenhum preço registrado ainda.</p>
-        ) : (
-          <ul>
-            {prices.map((item) => (
-              <li key={item.id}>
-                <p>Preço: {formatPrice(item.price)}</p>
-                <p>Coletado em: {formatDate(item.collected_at)}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      
       <div>
         <h2>Estatísticas</h2>
 
