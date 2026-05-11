@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { formatPrice, formatDate } from "../utils/formatters";
+import { formatPrice} from "../utils/formatters";
 import { useProductDetails } from "../hooks/useProductDetails";
 import ProductInfo from "../components/products/ProductInfo";
 import PriceHistory from "../components/products/PriceHistory";
-
+import StatsFilters from "../components/products/StatsFilters";
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -65,43 +65,23 @@ function ProductDetailsPage() {
 
   return (
     <main>
-      <ProductInfo product={product} refreshing={refreshing} onRefresh={handleRefreshPrice}/>
+      <ProductInfo
+        product={product}
+        refreshing={refreshing}
+        onRefresh={handleRefreshPrice}
+      />
 
-      <PriceHistory prices={prices}/>
+      <PriceHistory prices={prices} />
 
-      
       <div>
         <h2>Estatísticas</h2>
 
-        <h3>Metricas</h3>
-        {statsOptions.map((option) => (
-          <div key={option.value}>
-            <input
-              type="checkbox"
-              checked={selectedStatsFields.includes(option.value)}
-              onChange={(e) =>
-                e.target.checked
-                  ? setSelectedStatsFields([
-                      ...selectedStatsFields,
-                      option.value,
-                    ])
-                  : setSelectedStatsFields(
-                      selectedStatsFields.filter(
-                        (item) => item !== option.value,
-                      ),
-                    )
-              }
-            />
-            <span>{option.label}</span>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={handleApplyFilter}
-          disabled={selectedStatsFields.length === 0}
-        >
-          Aplicar filtros
-        </button>
+        <StatsFilters
+          statsOptions={statsOptions}
+          selectedStatsFields={selectedStatsFields}
+          onSelectedStatsFieldsChange={setSelectedStatsFields}
+          onApplyFilter={handleApplyFilter}
+        />
 
         {stats && Object.keys(stats).length > 0 ? (
           Object.entries(stats).map(([field, value]) => (
