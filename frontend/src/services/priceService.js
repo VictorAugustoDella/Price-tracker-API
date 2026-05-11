@@ -20,15 +20,19 @@ export async function getProductPrices(productId) {
   return data;
 }
 
-export async function getProductStats(productId) {
+export async function getProductStats(productId, fields = []) {
   const token = localStorage.getItem("token");
-  const response = await fetch(
-    `http://localhost:5000/api/v1/products/${productId}/prices/stats`,
-    {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+
+  let url = `http://localhost:5000/api/v1/products/${productId}/prices/stats`;
+
+  if (Array.isArray(fields) && fields.length > 0) {
+    url += `?fields=${fields.join(",")}`;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   const data = await response.json();
 

@@ -8,6 +8,42 @@ import {
 } from "../services/priceService";
 import { formatPrice, formatDate } from "../utils/formatters";
 
+const statsLabels = {
+  current: "Preço atual",
+  lowest: "Menor preço",
+  highest: "Maior preço",
+  average: "Preço médio",
+  total: "Quantidade de coletas",
+  variation_percent: "Variação",
+  is_best_price: "Melhor preço",
+  last_30_days_average: "Média dos últimos 30 dias",
+  price_trend: "Tendência",
+};
+
+function formatStatValue(field, value) {
+  if (value === null || value === undefined) return "-";
+
+  if (
+    field === "current" ||
+    field === "lowest" ||
+    field === "highest" ||
+    field === "average" ||
+    field === "last_30_days_average"
+  ) {
+    return formatPrice(value);
+  }
+
+  if (field === "variation_percent") {
+    return `${value}%`;
+  }
+
+  if (field === "is_best_price") {
+    return value ? "Sim" : "Não";
+  }
+
+  return value;
+}
+
 function ProductDetailsPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -94,14 +130,15 @@ function ProductDetailsPage() {
       <div>
         <h2>Estatísticas</h2>
 
-        <p>Preço atual: {formatPrice(stats.current)}</p>
-        <p>Menor preço: {formatPrice(stats.lowest)}</p>
-        <p>Maior preço: {formatPrice(stats.highest)}</p>
-        <p>Preço médio: {formatPrice(stats.average)}</p>
-        <p>Quantidade de coletas: {stats.total}</p>
-        <p>Variação: {stats.variation_percent}%</p>
-        <p>Melhor preço: {stats.is_best_price ? "Sim" : "Não"}</p>
-        <p>Tendência: {stats.price_trend}</p>
+        {stats && Object.keys(stats).length > 0 ? (
+          Object.entries(stats).map(([field, value]) => (
+            <p key={field}>
+              {statsLabels[field] || field}: {formatStatValue(field, value)}
+            </p>
+          ))
+        ) : (
+          <p>Estatísticas indisponíveis.</p>
+        )}
       </div>
     </main>
   );
