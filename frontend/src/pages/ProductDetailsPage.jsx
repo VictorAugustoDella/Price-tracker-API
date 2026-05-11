@@ -51,13 +51,41 @@ function ProductDetailsPage() {
   const [prices, setPrices] = useState([]);
   const [stats, setStats] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const statsOptions = [
+    { value: "current", label: "Preço atual" },
+    { value: "lowest", label: "Menor preço" },
+    { value: "highest", label: "Maior preço" },
+    { value: "average", label: "Preço médio" },
+    { value: "total", label: "Quantidade de coletas" },
+    { value: "variation_percent", label: "Variação" },
+    { value: "is_best_price", label: "Melhor preço" },
+    { value: "last_30_days_average", label: "Média dos últimos 30 dias" },
+    { value: "price_trend", label: "Tendência" },
+  ];
+
+  const [selectedStatsFields, setSelectedStatsFields] = useState([
+    "current",
+    "lowest",
+    "highest",
+  ]);
+
+  async function handleApplyFilter() {
+    setError(null);
+
+    try {
+      const productStatsData = await getProductStats(id, selectedStatsFields);
+      setStats(productStatsData);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   const { id } = useParams();
 
   async function fetchProductDetails() {
     const productData = await getProductById(id);
     const priceData = await getProductPrices(id);
-    const statsData = await getProductStats(id);
+    const statsData = await getProductStats(id, selectedStatsFields);
     setProduct(productData);
     setPrices(priceData);
     setStats(statsData);
@@ -129,6 +157,36 @@ function ProductDetailsPage() {
       </div>
       <div>
         <h2>Estatísticas</h2>
+
+        <h3>Metricas</h3>
+        {statsOptions.map((option) => (
+          <div key={option.value}>
+            <input
+              type="checkbox"
+              checked={selectedStatsFields.includes(option.value)}
+              onChange={(e) =>
+                e.target.checked
+                  ? setSelectedStatsFields([
+                      ...selectedStatsFields,
+                      option.value,
+                    ])
+                  : setSelectedStatsFields(
+                      selectedStatsFields.filter(
+                        (item) => item !== option.value,
+                      ),
+                    )
+              }
+            />
+            <span>{option.label}</span>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={handleApplyFilter}
+          disabled={selectedStatsFields.length === 0}
+        >
+          Aplicar filtros
+        </button>
 
         {stats && Object.keys(stats).length > 0 ? (
           Object.entries(stats).map(([field, value]) => (
