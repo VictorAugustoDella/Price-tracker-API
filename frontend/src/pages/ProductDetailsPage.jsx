@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { formatPrice, formatDate } from "../utils/formatters";
 import { useProductDetails } from "../hooks/useProductDetails";
+import ProductInfo from "../components/products/ProductInfo";
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -62,19 +63,8 @@ function ProductDetailsPage() {
 
   return (
     <main>
-      <div>
-        <p>Produto: {product.product}</p>
-        <p>Nome raspado: {product.scraped_name}</p>
-        <p>Site: {product.site}</p>
-        <a href={product.url} target="_blank" rel="noreferrer">
-          Abrir produto na loja
-        </a>
-        <p>Adicionado em: {formatDate(product.added_at)}</p>
-        <p>Última mudança: {formatDate(product.last_change)}</p>
-        <button onClick={handleRefreshPrice} disabled={refreshing}>
-          {refreshing ? "Atualizando preço..." : "Atualizar preço"}
-        </button>
-      </div>
+      <ProductInfo product={product} refreshing={refreshing} onRefresh={handleRefreshPrice}/>
+
       <div>
         <h2>Histórico de preços</h2>
 
