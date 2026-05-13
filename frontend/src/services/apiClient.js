@@ -1,31 +1,21 @@
 import { refreshAccessToken } from "./authService";
 
 export async function authenticatedFetch(url, options = {}) {
-  const access_token = localStorage.getItem("token");
-  const headers = {
-    ...options.headers,
-    Authorization: `Bearer ${access_token}`,
-  };
 
   let response = await fetch(url, {
     ...options,
-    headers,
+    credentials: "include",
   });
 
   if (response.status !== 401) {
     return response;
   }
-
-  const newAccessToken = await refreshAccessToken();
-
-  const refreshedHeaders = {
-    ...options.headers,
-    Authorization: `Bearer ${newAccessToken}`,
-  };
+  
+  await refreshAccessToken();
 
   response = await fetch(url, {
     ...options,
-    headers: refreshedHeaders,
+    credentials: "include",
   });
 
   return response;

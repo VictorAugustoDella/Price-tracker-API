@@ -25,7 +25,8 @@ def create_app(database_uri=None):
         app,
         resources={r"/api/*": {"origins": "http://localhost:5173"}},
         allow_headers=["Content-Type", "Authorization"],
-        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        supports_credentials=True
     )
     
     app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'dev-secret-key')

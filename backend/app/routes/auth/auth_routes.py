@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from app.routes.auth import auth_bp
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from app.services.user_service import register_user_service, login_user_service
 
 @auth_bp.route('/register', methods=['POST'])
@@ -43,3 +43,10 @@ def refresh_token():
     
     return response, 200
 
+@auth_bp.route('/logout', methods=['POST'])
+def logout_user():
+    response = jsonify({})
+    
+    unset_jwt_cookies(response)
+    
+    return response, 200

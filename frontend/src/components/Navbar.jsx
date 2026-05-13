@@ -1,13 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../services/authService";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAuthed = typeof window !== "undefined" && !!localStorage.getItem("token");
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh_token")
+  async function handleLogout() {
+    await logout();
     navigate("/login");
   }
 
@@ -23,7 +22,16 @@ function Navbar() {
           className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-foreground"
         >
           <span className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-sm">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M3 17l6-6 4 4 8-8" />
               <path d="M14 7h7v7" />
             </svg>
@@ -38,23 +46,27 @@ function Navbar() {
           >
             Dashboard
           </Link>
-          {!isAuthed && (
-            <>
-              <Link
-                to={"/login"}
-                className={`${linkBase} ${isActive("/login") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-              >
-                Login
-              </Link>
-              <Link
-                to={"/register"}
-                className={`${linkBase} ${isActive("/register") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-              >
-                Register
-              </Link>
-            </>
-          )}
-          <button type="button" onClick={handleLogout} className="btn btn-ghost ml-1 !py-1.5 !px-3 text-sm">
+
+          <>
+            <Link
+              to={"/login"}
+              className={`${linkBase} ${isActive("/login") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+            >
+              Login
+            </Link>
+            <Link
+              to={"/register"}
+              className={`${linkBase} ${isActive("/register") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+            >
+              Register
+            </Link>
+          </>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="btn btn-ghost ml-1 !py-1.5 !px-3 text-sm"
+          >
             Logout
           </button>
         </div>
