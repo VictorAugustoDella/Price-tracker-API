@@ -72,7 +72,7 @@ def create_app(database_uri=None):
         if request.method == "OPTIONS":
             return None
         
-        verify_jwt_in_request(optional=True)
+        verify_jwt_in_request(optional=True, verify_type=False)
         user_id = get_jwt_identity()
             
         if user_id:
