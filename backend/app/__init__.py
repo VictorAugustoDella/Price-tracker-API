@@ -32,6 +32,11 @@ def create_app(database_uri=None):
     app.config['JWT_SECRET_KEY'] = getenv('JWT_SECRET_KEY', 'dev-jwt-secret-key')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+    app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
+    app.config['JWT_COOKIE_SECURE'] = False
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+    app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+    app.config['JWT_REFRESH_COOKIE_PATH'] = '/api/v1/auth/refresh'
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
     
     db.init_app(app)
