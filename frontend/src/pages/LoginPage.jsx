@@ -18,6 +18,7 @@ function LoginPage() {
     try {
       const data = await login(email, password);
       localStorage.setItem("token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token)
       navigate("/");
     } catch (err) {
       setError(err.message);
