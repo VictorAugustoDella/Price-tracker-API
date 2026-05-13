@@ -89,6 +89,7 @@ def test_login_success(client, user):
     
     assert response.status_code == 200
     assert "access_token" in data
+    assert "refresh_token" in data
 
 def test_login_wrong_password(client, user):
     response = client.post(
@@ -130,3 +131,54 @@ def test_login_missing_field(client, user):
     
     assert response.status_code == 400
     assert "email and password are required" in data['error']
+    
+
+
+def test_refresh_token_success(client, user):
+    login_response = client.post(
+        '/api/v1/auth/login',
+        json={
+            "email": "teste2fixture@gmail.com",
+            "password": "Senhateste4321"
+        }
+    )
+
+    login_data = login_response.get_json()
+    refresh_token = login_data["refresh_token"]
+
+    refresh_response = client.post(
+        '/api/v1/auth/refresh',
+        headers={
+            "Authorization": f"Bearer {refresh_token}"
+        }
+    )
+
+    refresh_data = refresh_response.get_json()
+
+    assert refresh_response.status_code == 200
+    assert "access_token" in refresh_data
+    
+
+def test_refresh_token_rejects_access_token(client, user):
+    login_response = client.post(
+        '/api/v1/auth/login',
+        json={
+            "email": "teste2fixture@gmail.com",
+            "password": "Senhateste4321"
+        }
+    )
+
+    login_data = login_response.get_json()
+    access_token = login_data["access_token"]
+
+    refresh_response = client.post(
+        '/api/v1/auth/refresh',
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    refresh_data = refresh_response.get_json()
+
+    assert refresh_response.status_code == 422
+    assert "Only refresh tokens are allowed" in refresh_data["msg"]

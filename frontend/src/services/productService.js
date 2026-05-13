@@ -1,10 +1,12 @@
-export async function getProducts() {
-  const token = localStorage.getItem("token");
-  const response = await fetch("http://localhost:5000/api/v1/products", {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+import { authenticatedFetch } from "./apiClient";
 
+export async function getProducts() {
+  const response = await authenticatedFetch(
+    "http://localhost:5000/api/v1/products",
+    {
+      method: "GET",
+    },
+  );
   const data = await response.json();
 
   if (!response.ok) {
@@ -15,15 +17,16 @@ export async function getProducts() {
 }
 
 export async function createProduct(product, url) {
-  const token = localStorage.getItem("token");
-  const response = await fetch("http://localhost:5000/api/v1/products", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+  const response = await authenticatedFetch(
+    "http://localhost:5000/api/v1/products",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ product, url }),
     },
-    body: JSON.stringify({ product, url }),
-  });
+  );
 
   const data = await response.json();
 
@@ -35,13 +38,12 @@ export async function createProduct(product, url) {
 }
 
 export async function deleteProduct(id) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await authenticatedFetch(
+    `http://localhost:5000/api/v1/products/${id}`,
+    {
+      method: "DELETE",
     },
-  });
+  );
 
   if (!response.ok) {
     const data = await response.json();
@@ -50,15 +52,16 @@ export async function deleteProduct(id) {
 }
 
 export async function updateProduct(id, product) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+  const response = await authenticatedFetch(
+    `http://localhost:5000/api/v1/products/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ product }),
     },
-    body: JSON.stringify({ product }),
-  });
+  );
 
   const data = await response.json();
 
@@ -70,13 +73,12 @@ export async function updateProduct(id, product) {
 }
 
 export async function getProductById(id) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await authenticatedFetch(
+    `http://localhost:5000/api/v1/products/${id}`,
+    {
+      method: "GET",
     },
-  });
+  );
 
   const data = await response.json();
 

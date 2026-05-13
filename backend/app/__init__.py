@@ -14,6 +14,7 @@ from app.services.user_service import update_last_access
 from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
+from datetime import timedelta
 
 migrate = Migrate()
 
@@ -29,6 +30,8 @@ def create_app(database_uri=None):
     
     app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'dev-secret-key')
     app.config['JWT_SECRET_KEY'] = getenv('JWT_SECRET_KEY', 'dev-jwt-secret-key')
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
     
     db.init_app(app)
@@ -72,7 +75,7 @@ def create_app(database_uri=None):
         if request.method == "OPTIONS":
             return None
         
-        verify_jwt_in_request(optional=True)
+        verify_jwt_in_request(optional=True, verify_type=False)
         user_id = get_jwt_identity()
             
         if user_id:
