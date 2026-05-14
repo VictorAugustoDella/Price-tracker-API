@@ -147,12 +147,16 @@ def test_refresh_token_success(client, user):
         }
     )
 
+    csrf_refresh_token = client.get_cookie("csrf_refresh_token").value
+
     refresh_response = client.post(
         '/api/v1/auth/refresh',
+        headers={
+            "X-CSRF-TOKEN": csrf_refresh_token
+        }
     )
 
     refresh_data = refresh_response.get_json()
-    
     cookies = refresh_response.headers.getlist("Set-Cookie")
 
     assert refresh_response.status_code == 200
@@ -179,7 +183,14 @@ def test_logout_clears_cookies(client, user):
         }
     )
 
-    logout_response = client.post('/api/v1/auth/logout')
+    csrf_access_token = client.get_cookie("csrf_access_token").value
+
+    logout_response = client.post(
+        '/api/v1/auth/logout',
+        headers={
+            "X-CSRF-TOKEN": csrf_access_token
+        }
+    )
 
     cookies = logout_response.headers.getlist("Set-Cookie")
 
