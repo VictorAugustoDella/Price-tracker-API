@@ -2,9 +2,11 @@ from flask import request, jsonify
 from app.routes.product import product_bp
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.product_service import view_products_service, view_product_by_id_service, create_product_service, edit_product_service, delete_product_service
+from app.utils.activity import track_user_activity
 
 @product_bp.route('/products', methods=['GET'])
 @jwt_required()
+@track_user_activity
 def view_products():
     user_id = int(get_jwt_identity())
 
@@ -14,6 +16,7 @@ def view_products():
 
 @product_bp.route('/products/<int:id>', methods=['GET'])
 @jwt_required()
+@track_user_activity
 def view_product_by_id(id):
     user_id = int(get_jwt_identity())
 
@@ -23,6 +26,7 @@ def view_product_by_id(id):
 
 @product_bp.route('/products', methods=['POST']) 
 @jwt_required()
+@track_user_activity
 def create_product():
     user_id = int(get_jwt_identity())
     data = request.get_json()
@@ -33,6 +37,7 @@ def create_product():
 
 @product_bp.route('/products/<int:id>', methods=['PUT'])
 @jwt_required()
+@track_user_activity
 def edit_product(id):
     user_id = int(get_jwt_identity())   
     data = request.get_json()
@@ -43,6 +48,7 @@ def edit_product(id):
 
 @product_bp.route('/products/<int:id>', methods=['DELETE'])
 @jwt_required()
+@track_user_activity
 def delete_product(id):
     user_id = int(get_jwt_identity())
     

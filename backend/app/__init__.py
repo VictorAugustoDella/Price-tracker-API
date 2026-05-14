@@ -4,13 +4,11 @@ from app.routes.auth import auth_bp
 from app.routes.product import product_bp
 from app.routes.price import price_bp
 from os import getenv
-from flask_jwt_extended import JWTManager, get_jwt_identity
+from flask_jwt_extended import JWTManager
 from app.models.user_model import User
 from app.models.product_model import Product
 from app.models.price_history_model import PriceHistory
 from app.exceptions import ValidationError, NotFoundError, ConflictError, UnauthorizedError
-from flask_jwt_extended import verify_jwt_in_request
-from app.services.user_service import update_last_access
 from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
@@ -24,7 +22,7 @@ def create_app(database_uri=None):
     CORS(
         app,
         resources={r"/api/*": {"origins": "http://localhost:5173"}},
-        allow_headers=["Content-Type", "Authorization"],
+        allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         supports_credentials=True
     )
@@ -35,7 +33,7 @@ def create_app(database_uri=None):
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
     app.config['JWT_COOKIE_SECURE'] = False
-    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
     app.config['JWT_REFRESH_COOKIE_PATH'] = '/api/v1/auth/refresh'
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
@@ -74,17 +72,4 @@ def create_app(database_uri=None):
         app.logger.exception("Unhandled exception: %s", e)
         return jsonify({"error": "Internal server error"}), 500
     
-    
-    # update last access
-    @app.before_request
-    def update_user_activity():
-        if request.method == "OPTIONS":
-            return None
-        
-        verify_jwt_in_request(optional=True, verify_type=False)
-        user_id = get_jwt_identity()
-            
-        if user_id:
-            update_last_access(int(user_id))
-            
     return app
