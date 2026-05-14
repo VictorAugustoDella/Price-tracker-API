@@ -1,12 +1,31 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../services/authService";
+import { checkSession, logout } from "../services/authService";
+import { useEffect, useState } from "react";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [logged, setLogged] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function verifySession() {
+      try {
+        const isAuthed = await checkSession();
+        setLogged(isAuthed);
+      } catch (error) {
+        setLogged(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+    verifySession();
+  }, [location.pathname]);
+
   async function handleLogout() {
     await logout();
+    setLogged(false);
     navigate("/login");
   }
 
@@ -47,28 +66,32 @@ function Navbar() {
             Dashboard
           </Link>
 
-          <>
-            <Link
-              to={"/login"}
-              className={`${linkBase} ${isActive("/login") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-            >
-              Login
-            </Link>
-            <Link
-              to={"/register"}
-              className={`${linkBase} ${isActive("/register") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-            >
-              Register
-            </Link>
-          </>
+          {!loading && !logged && (
+            <>
+              <Link
+                to={"/login"}
+                className={`${linkBase} ${isActive("/login") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+              >
+                Login
+              </Link>
+              <Link
+                to={"/register"}
+                className={`${linkBase} ${isActive("/register") ? "text-foreground bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+              >
+                Register
+              </Link>
+            </>
+          )}
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="btn btn-ghost ml-1 !py-1.5 !px-3 text-sm"
-          >
-            Logout
-          </button>
+          {!loading && logged && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn btn-ghost ml-1 !py-1.5 !px-3 text-sm"
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </nav>

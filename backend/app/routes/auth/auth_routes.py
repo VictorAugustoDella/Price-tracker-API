@@ -49,3 +49,10 @@ def logout_user():
     unset_jwt_cookies(response)
     
     return response, 200
+
+@auth_bp.route('/session', methods=['GET'])
+@jwt_required()
+def session():
+    
+    
+    return jsonify(authenticated=True), 200
