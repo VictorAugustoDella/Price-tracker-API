@@ -197,3 +197,26 @@ def test_logout_clears_cookies(client, user):
     assert logout_response.status_code == 200
     assert any("access_token_cookie=;" in cookie for cookie in cookies)
     assert any("refresh_token_cookie=;" in cookie for cookie in cookies)
+    
+
+def test_session_valid(client, user):
+    client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "teste2fixture@gmail.com",
+            "password": "Senhateste4321"
+        }
+    )
+
+    response = client.get("/api/v1/auth/session")
+
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert data == {"authenticated": True}
+
+
+def test_session_without_login_fails(client):
+    response = client.get("/api/v1/auth/session")
+
+    assert response.status_code == 401
