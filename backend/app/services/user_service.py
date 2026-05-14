@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 from app.models.user_model import User
 from app.db import db
 from app.validators.auth_validators import validate_register_user, validate_login_user
@@ -8,9 +8,23 @@ from app.exceptions import UnauthorizedError, ConflictError
 def update_last_access(user_id: int):
     user = db.session.get(User, user_id)
 
-    if user:
-        user.last_access = datetime.now(UTC)
-        db.session.commit()
+    if not user:
+        return
+
+    now = datetime.now(UTC)
+    last_access = user.last_access
+
+    if last_access:
+        if last_access.tzinfo is None:
+            last_access = last_access.replace(tzinfo=UTC)
+
+        time_since_last_access = now - last_access
+
+        if time_since_last_access < timedelta(minutes=5):
+            return
+
+    user.last_access = now
+    db.session.commit()
 
 def register_user_service(data):
     validated_data = validate_register_user(data)

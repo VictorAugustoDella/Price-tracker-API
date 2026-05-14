@@ -1,32 +1,50 @@
-import { refreshAccessToken } from "./authService";
+import { getCookie, logout, refreshAccessToken } from "./authService";
 
-export async function authenticatedFetch(url, options = {}) {
-  const access_token = localStorage.getItem("token");
+const CSRF_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
+
+function buildAuthenticatedOptions(options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+
   const headers = {
     ...options.headers,
-    Authorization: `Bearer ${access_token}`,
   };
 
-  let response = await fetch(url, {
+  if (CSRF_METHODS.includes(method)) {
+    const csrfToken = getCookie("csrf_access_token");
+
+    if (csrfToken) {
+      headers["X-CSRF-TOKEN"] = csrfToken;
+    }
+  }
+
+  return {
     ...options,
     headers,
-  });
+    credentials: "include",
+  };
+}
+
+export async function authenticatedFetch(url, options = {}) {
+  let response = await fetch(url, buildAuthenticatedOptions(options));
 
   if (response.status !== 401) {
     return response;
   }
 
-  const newAccessToken = await refreshAccessToken();
+  try {
+    await refreshAccessToken();
 
-  const refreshedHeaders = {
-    ...options.headers,
-    Authorization: `Bearer ${newAccessToken}`,
-  };
+    response = await fetch(url, buildAuthenticatedOptions(options));
 
-  response = await fetch(url, {
-    ...options,
-    headers: refreshedHeaders,
-  });
+    return response;
+  } catch (error) {
+    try {
+      await logout();
+    } catch {
+      // Se o logout falhar, ainda assim redireciona para o login.
+    }
 
-  return response;
+    window.location.href = "/login";
+    throw error;
+  }
 }

@@ -2,9 +2,11 @@ from flask import request, jsonify
 from app.routes.price import price_bp
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.price_service import view_product_prices_by_id_service, view_product_prices_stats_by_id_service, refresh_product_price_by_id_service
+from app.utils.activity import track_user_activity
 
 @price_bp.route('/products/<int:id>/prices', methods=['GET'])
 @jwt_required()
+@track_user_activity
 def view_product_prices_by_id(id):
     user_id = int(get_jwt_identity())
 
@@ -14,6 +16,7 @@ def view_product_prices_by_id(id):
 
 @price_bp.route('/products/<int:id>/prices/stats', methods=['GET'])
 @jwt_required()
+@track_user_activity
 def view_product_prices_stats_by_id(id):
     user_id = int(get_jwt_identity())
     fields = request.args.get('fields')
@@ -24,6 +27,7 @@ def view_product_prices_stats_by_id(id):
 
 @price_bp.route('/products/<int:id>/prices/refresh', methods=['POST'])
 @jwt_required()
+@track_user_activity
 def refresh_product_price_by_id(id):
     user_id=int(get_jwt_identity())
 
