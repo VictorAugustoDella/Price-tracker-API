@@ -50,9 +50,7 @@ export function getCookie(name) {
 export async function refreshAccessToken() {
   const csrfToken = getCookie("csrf_refresh_token");
 
-  const headers = csrfToken
-    ? { "X-CSRF-TOKEN": csrfToken }
-    : {};
+  const headers = csrfToken ? { "X-CSRF-TOKEN": csrfToken } : {};
 
   const response = await fetch("http://localhost:5000/api/v1/auth/refresh", {
     method: "POST",
@@ -72,9 +70,7 @@ export async function refreshAccessToken() {
 export async function logout() {
   const csrfToken = getCookie("csrf_access_token");
 
-  const headers = csrfToken
-    ? { "X-CSRF-TOKEN": csrfToken }
-    : {};
+  const headers = csrfToken ? { "X-CSRF-TOKEN": csrfToken } : {};
 
   const response = await fetch("http://localhost:5000/api/v1/auth/logout", {
     method: "POST",
@@ -85,4 +81,21 @@ export async function logout() {
   if (!response.ok) {
     throw new Error("Erro ao realizar logout");
   }
+}
+
+export async function checkSession() {
+  const response = await fetch("http://localhost:5000/api/v1/auth/session", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (response.status === 401) {
+    return false;
+  }
+
+  if (!response.ok) {
+    throw new Error("Erro ao verificar sessão");
+  }
+
+  return true;
 }
