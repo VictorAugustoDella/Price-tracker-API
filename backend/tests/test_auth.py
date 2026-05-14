@@ -87,9 +87,13 @@ def test_login_success(client, user):
     
     data = response.get_json()
     
+    cookies = response.headers.getlist("Set-Cookie")
+    
+    
     assert response.status_code == 200
-    assert "access_token" in data
-    assert "refresh_token" in data
+    assert data == {}
+    assert any("access_token_cookie" in cookie for cookie in cookies)
+    assert any("refresh_token_cookie" in cookie for cookie in cookies)
 
 def test_login_wrong_password(client, user):
     response = client.post(
@@ -135,7 +139,7 @@ def test_login_missing_field(client, user):
 
 
 def test_refresh_token_success(client, user):
-    login_response = client.post(
+    client.post(
         '/api/v1/auth/login',
         json={
             "email": "teste2fixture@gmail.com",
@@ -143,24 +147,31 @@ def test_refresh_token_success(client, user):
         }
     )
 
-    login_data = login_response.get_json()
-    refresh_token = login_data["refresh_token"]
-
     refresh_response = client.post(
         '/api/v1/auth/refresh',
-        headers={
-            "Authorization": f"Bearer {refresh_token}"
-        }
     )
 
     refresh_data = refresh_response.get_json()
+    
+    cookies = refresh_response.headers.getlist("Set-Cookie")
 
     assert refresh_response.status_code == 200
-    assert "access_token" in refresh_data
+    assert refresh_data == {}
+    assert any("access_token_cookie" in cookie for cookie in cookies)
     
 
-def test_refresh_token_rejects_access_token(client, user):
-    login_response = client.post(
+def test_refresh_without_cookie_fails(client):
+
+    refresh_response = client.post(
+        '/api/v1/auth/refresh',
+    )
+
+    assert refresh_response.status_code == 401
+
+
+
+def test_logout_clears_cookies(client, user):
+    client.post(
         '/api/v1/auth/login',
         json={
             "email": "teste2fixture@gmail.com",
@@ -168,17 +179,10 @@ def test_refresh_token_rejects_access_token(client, user):
         }
     )
 
-    login_data = login_response.get_json()
-    access_token = login_data["access_token"]
+    logout_response = client.post('/api/v1/auth/logout')
 
-    refresh_response = client.post(
-        '/api/v1/auth/refresh',
-        headers={
-            "Authorization": f"Bearer {access_token}"
-        }
-    )
+    cookies = logout_response.headers.getlist("Set-Cookie")
 
-    refresh_data = refresh_response.get_json()
-
-    assert refresh_response.status_code == 422
-    assert "Only refresh tokens are allowed" in refresh_data["msg"]
+    assert logout_response.status_code == 200
+    assert any("access_token_cookie=;" in cookie for cookie in cookies)
+    assert any("refresh_token_cookie=;" in cookie for cookie in cookies)

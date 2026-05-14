@@ -21,8 +21,7 @@ def login_user():
     refresh_token = create_refresh_token(identity=str(user.id))
     
     response = jsonify (
-        access_token=access_token,
-        refresh_token=refresh_token
+        {}
     )
     
     set_access_cookies(response, access_token)
@@ -37,7 +36,7 @@ def refresh_token():
     user_id = get_jwt_identity()
     access_token = create_access_token(identity=str(user_id))
     
-    response = jsonify(access_token=access_token)
+    response = jsonify({})
     
     set_access_cookies(response, access_token)
     
