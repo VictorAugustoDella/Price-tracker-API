@@ -5,6 +5,7 @@ from app.validators.product_validators import validate_product_create, validate_
 from app.exceptions import NotFoundError, ConflictError
 from app.validators.price_validators import validate_scraped_price
 from app.services.scrapers.scraper_resolver import get_scraper
+from datetime import UTC, datetime, timedelta
 
 def view_products_service(user_id: int):
     products = Product.query.filter_by(user_id=user_id).all()
@@ -34,7 +35,7 @@ def create_product_service(user_id: int, data):
         
     price = validate_scraped_price(price)
         
-    new_product = Product(user_id=user_id, **validated_product, site=site, scraped_name=scraped_name)
+    new_product = Product(user_id=user_id, **validated_product, site=site, scraped_name=scraped_name, next_check_at=datetime.now(UTC) + timedelta(hours=1))
     
     db.session.add(new_product)
     db.session.flush() # gera o ID ainda sem o commit

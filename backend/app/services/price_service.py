@@ -6,6 +6,7 @@ from app.validators.price_validators import validate_price_fields
 from app.services.price_stats import calculate_stats
 from app.validators.price_validators import validate_scraped_price
 from app.services.scrapers.scraper_resolver import get_scraper
+from datetime import UTC, datetime, timedelta
 
 
 def view_product_prices_by_id_service(user_id: int, id: int):
@@ -71,14 +72,20 @@ def track_product_price_service(product_id: int):
         return None
 
     price = _scrape_validated_price(product)
+    
+    checked_at = datetime.now(UTC)
+
+    product.last_checked_at = checked_at
+    product.next_check_at = checked_at + timedelta(hours=1)
 
     last_price = PriceHistory.query.filter_by(
-        product_id=1
+        product_id=product.id
     ).order_by(
         PriceHistory.collected_at.desc()
     ).first()
 
     if last_price and last_price.price == price:
+        db.session.commit()
         return None
 
     product_price = PriceHistory(
