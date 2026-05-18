@@ -95,5 +95,13 @@ def track_product_price_service(product_id: int):
 
     db.session.add(product_price)
     db.session.commit()
+    
 
-    return product_price
+def get_due_product_ids_service():
+    now = datetime.now(UTC)
+
+    due_products = Product.query.filter(
+        Product.next_check_at <= now
+    ).all()
+
+    return [product.id for product in due_products]
