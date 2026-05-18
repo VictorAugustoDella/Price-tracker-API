@@ -42,7 +42,14 @@ def create_app(database_uri=None):
         "broker_url": getenv("CELERY_BROKER_URL"),
         "result_backend": getenv("CELERY_RESULT_BACKEND"),
         "task_ignore_result": True,
-}
+        "beat_schedule": {
+            "enqueue-due-product-checks-every-5-minutes": {
+                "task": "app.tasks.enqueue_due_product_checks_task",
+                "schedule": 300.0,
+            },
+    },
+    "timezone": "UTC",
+    }
     
     db.init_app(app)
     migrate.init_app(app, db)
