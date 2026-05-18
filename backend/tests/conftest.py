@@ -9,6 +9,7 @@ from app.models.price_history_model import PriceHistory
 from app.models.product_model import Product
 from app.models.user_model import User
 import app.services.product_service as product_service
+from datetime import UTC, datetime, timedelta
 
 
 @pytest.fixture
@@ -51,7 +52,8 @@ def product(app, user):
             url='https://www.amazon.com.br/test-product',
             site='amazon',
             scraped_name='scraped_name_example',
-            user_id=user_obj.id)
+            user_id=user_obj.id,
+            next_check_at=datetime.now(UTC) + timedelta(hours=1))
         
         db.session.add(product)
         db.session.commit()
@@ -82,7 +84,8 @@ def product_with_multiple_prices(app, user):
             url='https://www.amazon.com.br/test-product2',
             site='amazon',
             scraped_name='scraped_name2',
-            user_id=user_obj.id
+            user_id=user_obj.id,
+            next_check_at=datetime.now(UTC) + timedelta(hours=1)
         )
         db.session.add(product)
         db.session.commit()

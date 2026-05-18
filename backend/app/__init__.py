@@ -13,6 +13,7 @@ from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from datetime import timedelta
+from app.celery_app import celery_init_app
 
 migrate = Migrate()
 
@@ -37,6 +38,18 @@ def create_app(database_uri=None):
     app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
     app.config['JWT_REFRESH_COOKIE_PATH'] = '/api/v1/auth/refresh'
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
+    app.config["CELERY"] = {
+        "broker_url": getenv("CELERY_BROKER_URL"),
+        "result_backend": getenv("CELERY_RESULT_BACKEND"),
+        "task_ignore_result": True,
+        "beat_schedule": {
+            "enqueue-due-product-checks-every-5-minutes": {
+                "task": "app.tasks.enqueue_due_product_checks_task",
+                "schedule": 300.0,
+            },
+    },
+    "timezone": "UTC",
+    }
     
     db.init_app(app)
     migrate.init_app(app, db)
@@ -71,5 +84,7 @@ def create_app(database_uri=None):
 
         app.logger.exception("Unhandled exception: %s", e)
         return jsonify({"error": "Internal server error"}), 500
+    
+    celery_init_app(app)
     
     return app

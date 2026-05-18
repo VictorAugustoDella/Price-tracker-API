@@ -1,5 +1,5 @@
 from app.db import db
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 class Product(db.Model):
     __tablename__= 'products'
@@ -16,6 +16,8 @@ class Product(db.Model):
     url = db.Column(db.String, nullable=False)
     added_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), nullable=False)
     last_change = db.Column(db.DateTime,default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC), nullable=False)
+    last_checked_at = db.Column(db.DateTime, nullable=True)
+    next_check_at = db.Column(db.DateTime, nullable=False)
     
     
     def to_dict(self):       
