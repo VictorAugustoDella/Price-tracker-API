@@ -1,446 +1,693 @@
-<h1 align="center">💼 Price Tracker API</h1>
+<h1 align="center">📉 Price Tracker</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.13-blue?style=flat-square&logo=python" />
-  <img src="https://img.shields.io/badge/Flask-3.1.3-lightgrey?style=flat-square&logo=flask" />
-  <img src="https://img.shields.io/badge/FlaskSQLAlchemy-3.1.1-ff6347?style=flat-square" />
-  <img src="https://img.shields.io/badge/Playwright-Web%20Scraping-2ea44f?style=flat-square&logo=playwright" />
-  <img src="https://img.shields.io/badge/Pytest-Testes-6c5ce7?style=flat-square" />
-  <img src="https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=flat-square&logo=githubactions" />
+  Full-stack price monitoring platform for <strong>Amazon Brazil</strong> and <strong>Mercado Livre</strong>, featuring secure authentication, automatic background tracking, price history, and a responsive React dashboard.
 </p>
 
 <p align="center">
-  API RESTful para autenticação de usuários, cadastro de produtos por URL, scraping de preço, histórico de preços e estatísticas de variação ao longo do tempo.
+  <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flask-3.1.3-000000?style=flat-square&logo=flask&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-Frontend-61DAFB?style=flat-square&logo=react&logoColor=0B1F33" />
+  <img src="https://img.shields.io/badge/Vite-Build%20Tool-646CFF?style=flat-square&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/TailwindCSS-Styling-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Redis-Broker-DC382D?style=flat-square&logo=redis&logoColor=white" />
+  <img src="https://img.shields.io/badge/Celery-Background%20Jobs-37814A?style=flat-square" />
+  <img src="https://img.shields.io/badge/Playwright-Web%20Scraping-2EAD33?style=flat-square&logo=playwright&logoColor=white" />
+  <img src="https://img.shields.io/badge/Pytest-Tests-0A9EDC?style=flat-square&logo=pytest&logoColor=white" />
+  <img src="https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=flat-square&logo=githubactions&logoColor=white" />
+</p>
+
+<p align="center">
+  <strong>Project status:</strong> ✅ MVP v1 complete
 </p>
 
 ---
 
-## 📌 Sobre o projeto
+## 📌 About the project
 
-A proposta da API é simples e útil: o usuário cadastra um produto com um link válido da **Amazon Brasil** ou do **Mercado Livre**, e a aplicação:
+**Price Tracker** is a full-stack application built to monitor product prices over time.
 
-- autentica o usuário com JWT
-- isola os dados por usuário
-- identifica automaticamente qual scraper usar com base na URL
-- coleta o **preço atual** e o **nome real do produto**
-- cria o produto já com o **primeiro registro no histórico de preços**
-- permite atualizar o preço futuramente sem recriar o produto
-- transforma o histórico em estatísticas úteis
+The user registers a product using a valid URL from **Amazon Brazil** or **Mercado Livre**, and the application automatically:
 
-Em vez de o usuário informar preço manualmente no cadastro, a API usa **Playwright** para buscar esse valor direto na página do produto.
+- detects which marketplace scraper should be used;
+- collects the real product name;
+- extracts the current price from the product page;
+- creates the initial price history record;
+- periodically checks the product again in the background;
+- stores a new price history entry only when the price changes;
+- presents the data in a responsive dashboard with historical insights and statistics.
 
----
+This project was designed as a portfolio case study focused on building a more realistic full-stack application, going beyond basic CRUD by including:
 
-## ✨ Fluxo principal da aplicação
-
-1. o usuário cria conta e faz login
-2. envia `product` + `url` para cadastrar um produto
-3. a API resolve o scraper correto pela URL
-4. o preço e o nome raspado do produto são coletados
-5. o produto é salvo no banco
-6. o primeiro registro de preço é criado automaticamente em `price_history`
-7. quando quiser, o usuário chama o endpoint de **refresh**
-8. a API raspa o preço novamente e adiciona um novo registro ao histórico
-9. o usuário consulta histórico e estatísticas a qualquer momento
+- secure authentication;
+- background jobs;
+- job scheduling;
+- web scraping;
+- data modeling;
+- price analytics;
+- Docker orchestration;
+- automated tests;
+- CI workflows.
 
 ---
 
-## 🧰 Tecnologias utilizadas
+## 🎥 Demo & interface previews
 
-- [Flask](https://flask.palletsprojects.com/) - microframework web em Python
-- [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/) - ORM para banco de dados
-- [SQLAlchemy](https://www.sqlalchemy.org/) - camada de persistência
-- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/) - autenticação com JWT
-- [Flask-Migrate](https://flask-migrate.readthedocs.io/) - integração de migrations no Flask
-- [Alembic](https://alembic.sqlalchemy.org/) - versionamento de schema do banco
-- [Playwright](https://playwright.dev/python/) - scraping dos preços
-- [Pytest](https://docs.pytest.org/) - testes automatizados
-- [Gunicorn](https://gunicorn.org/) - servidor WSGI para produção
-- [python-dotenv](https://pypi.org/project/python-dotenv/) - carregamento de variáveis de ambiente
-- [psycopg2-binary](https://www.psycopg.org/) - driver PostgreSQL
-- [GitHub Actions](https://github.com/features/actions) - execução de CI
+> The screenshots below show the final MVP interface running locally with sample product data.
 
----
+### 🔐 Login screen
 
-## 🛒 Marketplaces suportados
+![Login screen](docs/screenshots/login.png)
 
-Atualmente, o fluxo automático de scraping funciona para links destes domínios:
+### 🧾 Register screen
 
-- `amazon.com.br`
-- `mercadolivre.com.br`
+![Register screen](docs/screenshots/register.png)
 
-Se a URL não pertencer a um desses domínios, a API retorna erro de validação.
+### 📊 Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### 🛒 Product details, price history & statistics
+
+![Product details](docs/screenshots/product-details.png)
 
 ---
 
-## 🔐 Regras importantes da API
+## ✨ Main features
 
-- cada usuário enxerga apenas os próprios dados
-- o cadastro de produto exige uma URL válida
-- o preço inicial é coletado automaticamente no cadastro
-- o endpoint de refresh adiciona um novo preço ao histórico
-- o mesmo usuário não pode cadastrar a **mesma URL** duas vezes
-- as estatísticas podem ser filtradas com o parâmetro `fields`
+### 🔐 Secure authentication
 
----
-
-## 🚀 Funcionalidades
-
-### Autenticação
-- cadastro de usuário
-- login com geração de token JWT
-- proteção de rotas autenticadas
-- atualização automática de `last_access` em requisições autenticadas
-
-### Produtos
-- criação de produtos com scraping automático
-- listagem de produtos do usuário autenticado
-- busca de produto por ID
-- edição do nome do produto
-- remoção de produto
-- bloqueio de URL duplicada por usuário
-
-### Histórico de preços
-- criação automática do primeiro preço no cadastro do produto
-- listagem do histórico em ordem decrescente de coleta
-- refresh de preço com novo scraping do link já salvo
-
-### Estatísticas
-- preço atual
-- média
-- menor preço
-- maior preço
-- total de registros
-- percentual de variação
-- identificação de melhor preço
-- média dos últimos 30 dias
-- tendência de preço (`up`, `down`, `stable`)
-- filtro de campos via query param `fields`
+- user registration;
+- login and logout flow;
+- JWT authentication stored in **HTTP-only cookies**;
+- access token and refresh token separation;
+- refresh flow based on secure cookies;
+- CSRF protection for state-changing requests;
+- authenticated session verification endpoint;
+- protected frontend routes;
+- throttled user activity tracking via `last_access`.
 
 ---
 
-## 📡 Endpoints principais
+### 🛒 Product management
+
+- register a product using a marketplace URL;
+- automatic marketplace resolution;
+- support for:
+  - `amazon.com.br`
+  - `mercadolivre.com.br`
+- scraping of:
+  - product name;
+  - current product price;
+- product listing per authenticated user;
+- product details page;
+- rename tracked products;
+- delete tracked products;
+- duplicate URL prevention per user.
+
+---
+
+### 🏷️ Price history
+
+- first historical price automatically saved during product creation;
+- manual price refresh endpoint;
+- automatic background price tracking;
+- price history ordered by collection date;
+- new automatic history entry saved **only if the detected price changed**.
+
+---
+
+### 📊 Price statistics
+
+The application calculates:
+
+- current price;
+- average price;
+- lowest price;
+- highest price;
+- total number of records;
+- variation percentage;
+- best-price indicator;
+- last 30 days average;
+- price trend:
+  - `up`
+  - `down`
+  - `stable`
+
+It also supports selective field filtering using the `fields` query parameter.
+
+Example:
+
+```http
+GET /api/v1/products/1/prices/stats?fields=current,lowest,price_trend
+```
+
+---
+
+### ⚙️ Automatic background monitoring
+
+The project uses **Celery**, **Redis**, and **Celery Beat** to track products automatically.
+
+Each product stores:
+
+- `last_checked_at`
+- `next_check_at`
+
+When a new product is registered:
+
+```txt
+next_check_at = creation time + 1 hour
+```
+
+A periodic scheduler runs every 5 minutes:
+
+```txt
+Celery Beat
+↓
+enqueue_due_product_checks_task
+↓
+Find products with next_check_at <= now
+↓
+Enqueue one tracking task per due product
+↓
+Celery Worker scrapes the price and updates tracking timestamps
+```
+
+This avoids updating every product at the exact same time and distributes the tracking workload more naturally.
+
+---
+
+## 🧠 Architecture overview
+
+### Backend
+
+The backend follows a layered structure:
+
+```txt
+routes → services → validators/models
+```
+
+- **routes/**  
+  HTTP endpoints and request/response orchestration.
+
+- **services/**  
+  Business logic, scraping workflows, statistics, tracking flows.
+
+- **validators/**  
+  Input validation and domain-specific checks.
+
+- **models/**  
+  SQLAlchemy database models.
+
+- **utils/**  
+  Reusable helpers and cross-cutting utilities.
+
+- **tasks.py**  
+  Celery tasks for background processing.
+
+---
+
+### Frontend
+
+The frontend is organized around:
+
+- **pages/**  
+  Application screens.
+
+- **components/**  
+  Reusable visual sections.
+
+- **hooks/**  
+  Page state and orchestration logic.
+
+- **services/**  
+  HTTP communication with the backend.
+
+- **utils/**  
+  Formatting helpers and reusable utilities.
+
+---
+
+### Background processing
+
+```txt
+Flask API
+↓
+Redis broker
+↓
+Celery Worker
+↓
+Database updates / scraping tasks
+```
+
+Scheduling is handled by:
+
+```txt
+Celery Beat
+↓
+Periodic dispatch of due tracking checks
+```
+
+---
+
+## 🧰 Tech stack
+
+### Backend
+
+- [Python 3.13](https://www.python.org/)
+- [Flask](https://flask.palletsprojects.com/)
+- [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/)
+- [Flask-Migrate](https://flask-migrate.readthedocs.io/)
+- [Alembic](https://alembic.sqlalchemy.org/)
+- [Flask-CORS](https://flask-cors.readthedocs.io/)
+- [Playwright](https://playwright.dev/python/)
+- [Celery](https://docs.celeryq.dev/)
+- [Redis](https://redis.io/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Gunicorn](https://gunicorn.org/)
+
+### Frontend
+
+- [React](https://react.dev/)
+- [Vite](https://vite.dev/)
+- [JavaScript](https://developer.mozilla.org/docs/Web/JavaScript)
+- [React Router DOM](https://reactrouter.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- Fetch API
+
+### Testing & DevOps
+
+- [Pytest](https://docs.pytest.org/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [GitHub Actions](https://github.com/features/actions)
+
+---
+
+## 🛒 Supported marketplaces
+
+Currently, Price Tracker supports product URLs from:
+
+- **Amazon Brazil**  
+  `amazon.com.br`
+
+- **Mercado Livre**  
+  `mercadolivre.com.br`
+
+If a URL does not belong to a supported marketplace, the backend returns a validation error.
+
+> Note: Mercado Livre may occasionally block automated access or require login. When this happens, the application returns a clear scraping error instead of failing silently or showing a misleading product parsing error.
+
+---
+
+## 📡 API endpoints
 
 ### Auth
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/auth/register` | Create a new user |
+| `POST` | `/api/v1/auth/login` | Authenticate user and set secure cookies |
+| `POST` | `/api/v1/auth/refresh` | Refresh the access cookie |
+| `POST` | `/api/v1/auth/logout` | Clear authentication cookies |
+| `GET` | `/api/v1/auth/session` | Check whether the current session is authenticated |
+
+---
 
 ### Products
-- `GET /api/v1/products`
-- `GET /api/v1/products/<id>`
-- `POST /api/v1/products`
-- `PUT /api/v1/products/<id>`
-- `DELETE /api/v1/products/<id>`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/products` | List all products from the authenticated user |
+| `GET` | `/api/v1/products/<id>` | Get a single tracked product |
+| `POST` | `/api/v1/products` | Create a product and scrape its initial price |
+| `PUT` | `/api/v1/products/<id>` | Rename a tracked product |
+| `DELETE` | `/api/v1/products/<id>` | Delete a tracked product |
+
+---
 
 ### Prices
-- `GET /api/v1/products/<id>/prices`
-- `GET /api/v1/products/<id>/prices/stats`
-- `POST /api/v1/products/<id>/prices/refresh`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/products/<id>/prices` | List the historical prices of a product |
+| `GET` | `/api/v1/products/<id>/prices/stats` | Return statistics for the product price history |
+| `POST` | `/api/v1/products/<id>/prices/refresh` | Manually scrape and store a new price record |
 
 ---
 
-## 🐳 Como rodar com Docker
+## 🔐 Authentication model
 
-### 1. Clone o repositório
+The final authentication flow is browser-oriented and uses secure cookies instead of exposing tokens in `localStorage`.
 
-```bash
-git clone https://github.com/VictorAugustoDella/Price-tracker-API
-cd Price-tracker-API
+### Final flow
+
+```txt
+Login request
+↓
+Backend validates credentials
+↓
+Access token + refresh token are stored in HTTP-only cookies
+↓
+Frontend sends requests using credentials: "include"
+↓
+CSRF tokens protect state-changing requests
+↓
+Session endpoint lets the UI know whether the user is authenticated
 ```
 
-### 2. Crie o arquivo `.env`
+### Why this approach?
 
-Use o arquivo de exemplo como base:
-
-```bash
-cp .env.example .env
-```
-
-### 3. Suba os containers
-
-```bash
-docker compose up --build
-```
-
-### 4. Acesse a API
-
-```bash
-http://localhost:5000
-```
-
-### Observação
-
-O container da aplicação executa as migrations automaticamente antes de subir o servidor.
+This architecture reduces token exposure in the frontend and gives the project a more production-inspired authentication flow.
 
 ---
 
-## 💻 Como rodar localmente sem Docker
+## 🐳 Running the full project with Docker
 
-### 1. Clone o repositório
+This is the recommended way to run the application.
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/VictorAugustoDella/Price-tracker-API.git
 cd Price-tracker-API
 ```
 
-### 2. Crie e ative a virtualenv
+### 2. Create the root `.env` file
+
+```bash
+cp .env.example .env
+```
+
+### 3. Start the complete stack
+
+```bash
+docker compose up --build
+```
+
+This command starts:
+
+- React frontend;
+- Flask API;
+- PostgreSQL database;
+- Redis broker;
+- Celery Worker;
+- Celery Beat scheduler.
+
+### 4. Access the application
+
+Frontend:
+
+```txt
+http://localhost:5173
+```
+
+Backend API:
+
+```txt
+http://localhost:5000
+```
+
+> The backend container automatically runs database migrations before starting the API server.
+
+---
+
+## 🔑 Environment variables
+
+Create a `.env` file in the project root using `.env.example` as a starting point.
+
+```env
+SECRET_KEY=change-me
+JWT_SECRET_KEY=change-me-too
+DATABASE_URL=postgresql+psycopg2://project:project@db:5432/project
+
+POSTGRES_USER=project
+POSTGRES_PASSWORD=change-me
+POSTGRES_DB=project
+
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+```
+
+---
+
+## 💻 Running locally without Docker
+
+Docker Compose is the preferred setup because it launches the entire stack consistently.
+
+If you want to run components manually, use the steps below.
+
+---
+
+### Backend setup
+
+```bash
+cd backend
+python -m venv .venv
+```
 
 #### Linux / macOS
 
 ```bash
-python -m venv .venv
 source .venv/bin/activate
 ```
 
-#### Windows (PowerShell)
+#### Windows PowerShell
 
-```bash
-python -m venv .venv
+```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-### 3. Instale as dependências
+Install backend dependencies:
 
 ```bash
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
 ```
 
-### 4. Instale o navegador do Playwright
+Install Playwright Chromium:
 
 ```bash
 python -m playwright install chromium
 ```
 
-### 5. Crie o arquivo `.env`
+Create a local `.env` file and configure a database connection.
 
-Copie o arquivo de exemplo:
-
-```bash
-cp .env.example .env
-```
-
-Se quiser rodar localmente com SQLite, ajuste o `.env` para algo assim:
+Example using SQLite:
 
 ```env
+SECRET_KEY=local-secret-key
+JWT_SECRET_KEY=local-jwt-secret-key
 DATABASE_URL=sqlite:///local.db
-SECRET_KEY=sua_secret_key
-JWT_SECRET_KEY=sua_jwt_secret_key
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
 ```
 
-### 6. Rode as migrations
+Run migrations:
 
 ```bash
 flask --app run.py db upgrade
 ```
 
-### 7. Inicie a aplicação
+Start the backend:
 
 ```bash
 python run.py
 ```
 
-### 8. Acesse a API
+---
+
+### Frontend setup
+
+Open another terminal:
 
 ```bash
-http://localhost:5000
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend will be available at:
+
+```txt
+http://localhost:5173
 ```
 
 ---
 
-## 🔑 Variáveis de ambiente
+### Redis, Celery Worker, and Celery Beat
 
-### Exemplo usado com Docker / PostgreSQL
+To reproduce the automatic tracking system without Docker, you also need:
 
-```env
-SECRET_KEY=change-me
-JWT_SECRET_KEY=change-me-too
-DATABASE_URL=postgresql+psycopg2://project:project@db:5432/project
-POSTGRES_USER=project
-POSTGRES_PASSWORD=change-me
-POSTGRES_DB=project
+- a running Redis server;
+- a Celery Worker;
+- a Celery Beat scheduler.
+
+Example commands from the `backend/` directory:
+
+```bash
+celery -A make_celery worker --loglevel=INFO
 ```
 
-### Exemplo local com SQLite
+```bash
+celery -A make_celery beat --loglevel=INFO
+```
 
-```env
-DATABASE_URL=sqlite:///local.db
-SECRET_KEY=sua_secret_key
-JWT_SECRET_KEY=sua_jwt_secret_key
+For this reason, Docker Compose remains the recommended setup.
+
+---
+
+## 🧪 Tests
+
+Run backend tests from the `backend/` directory:
+
+```bash
+pytest
+```
+
+For more detailed output:
+
+```bash
+pytest -v
+```
+
+The test suite covers:
+
+- authentication flows;
+- secure session endpoint behavior;
+- product CRUD;
+- ownership authorization;
+- price history endpoints;
+- price statistics;
+- automatic tracking services;
+- scheduled price-check support logic.
+
+The project also includes a **GitHub Actions CI pipeline** that validates the test suite automatically.
+
+---
+
+## 🗂️ Project structure
+
+```txt
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── backend/
+│   ├── app/
+│   │   ├── config/
+│   │   │   └── settings.py
+│   │   ├── models/
+│   │   │   ├── price_history_model.py
+│   │   │   ├── product_model.py
+│   │   │   └── user_model.py
+│   │   ├── routes/
+│   │   │   ├── auth/
+│   │   │   ├── price/
+│   │   │   └── product/
+│   │   ├── services/
+│   │   │   ├── scrapers/
+│   │   │   ├── price_service.py
+│   │   │   ├── price_stats.py
+│   │   │   ├── product_service.py
+│   │   │   └── user_service.py
+│   │   ├── utils/
+│   │   │   ├── activity.py
+│   │   │   └── field_validators.py
+│   │   ├── validators/
+│   │   │   ├── auth_validators.py
+│   │   │   ├── price_validators.py
+│   │   │   └── product_validators.py
+│   │   ├── __init__.py
+│   │   ├── celery_app.py
+│   │   ├── db.py
+│   │   ├── exceptions.py
+│   │   └── tasks.py
+│   ├── migrations/
+│   ├── tests/
+│   │   ├── conftest.py
+│   │   ├── test_auth.py
+│   │   ├── test_price.py
+│   │   ├── test_price_tracking.py
+│   │   └── test_product.py
+│   ├── Dockerfile
+│   ├── dev-requirements.txt
+│   ├── make_celery.py
+│   ├── pytest.ini
+│   ├── requirements.txt
+│   └── run.py
+├── docs/
+│   └── screenshots/
+│       ├── dashboard.png
+│       ├── login.png
+│       ├── product-details.png
+│       └── register.png
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── Dockerfile
+│   ├── package.json
+│   └── package-lock.json
+├── .env.example
+├── docker-compose.yml
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## 🧪 Exemplo de fluxo de uso
+## 🧱 Layer responsibilities
 
-### 1. Criar conta
-
-```http
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-  "name": "Victor Augusto",
-  "email": "victor@email.com",
-  "password": "123456Aa"
-}
-```
-
-### Exemplo de resposta
-
-```json
-{
-  "id": 1,
-  "name": "Victor Augusto",
-  "email": "victor@email.com",
-  "created_at": "2026-03-19T18:00:00.000000",
-  "last_access": null
-}
-```
-
-### 2. Fazer login
-
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
-
-{
-  "email": "victor@email.com",
-  "password": "123456Aa"
-}
-```
-
-### Exemplo de resposta
-
-```json
-{
-  "access_token": "seu_token_jwt"
-}
-```
-
-### 3. Cadastrar um produto
-
-> No cadastro, a API raspa automaticamente o preço atual e o nome do produto com base na URL.
-
-```http
-POST /api/v1/products
-Authorization: Bearer <seu_token>
-Content-Type: application/json
-
-{
-  "product": "Monitor Gamer",
-  "url": "https://www.amazon.com.br/exemplo-produto"
-}
-```
-
-### Exemplo de resposta
-
-```json
-{
-  "id": 1,
-  "product": "Monitor Gamer",
-  "scraped_name": "Monitor Gamer 27 Polegadas Full HD",
-  "site": "amazon",
-  "url": "https://www.amazon.com.br/exemplo-produto",
-  "added_at": "2026-03-19T18:05:00.000000",
-  "last_change": "2026-03-19T18:05:00.000000"
-}
-```
-
-### 4. Consultar o histórico de preços
-
-```http
-GET /api/v1/products/1/prices
-Authorization: Bearer <seu_token>
-```
-
-### Exemplo de resposta
-
-```json
-[
-  {
-    "id": 1,
-    "product_id": 1,
-    "price": 1899.9,
-    "collected_at": "2026-03-19T18:05:00.000000"
-  }
-]
-```
-
-### 5. Atualizar o preço do produto
-
-> Esse endpoint faz um novo scraping da URL já salva e cria um novo registro no histórico.
-
-```http
-POST /api/v1/products/1/prices/refresh
-Authorization: Bearer <seu_token>
-```
-
-### Exemplo de resposta
-
-```json
-{
-  "id": 2,
-  "product_id": 1,
-  "price": 1799.9,
-  "collected_at": "2026-03-20T10:15:00.000000"
-}
-```
-
-### 6. Consultar estatísticas
-
-```http
-GET /api/v1/products/1/prices/stats?fields=current,lowest,price_trend
-Authorization: Bearer <seu_token>
-```
-
-### Exemplo de resposta
-
-```json
-{
-  "current": 1799.9,
-  "lowest": 1799.9,
-  "price_trend": "down"
-}
-```
+| Layer | Responsibility |
+|---|---|
+| `routes/` | Handles HTTP endpoints |
+| `services/` | Encapsulates business rules |
+| `validators/` | Validates payloads and domain constraints |
+| `models/` | Represents persisted entities |
+| `scrapers/` | Extracts product data from marketplaces |
+| `tasks.py` | Defines Celery background jobs |
+| `tests/` | Covers critical application behavior |
 
 ---
 
-## 📊 Campos disponíveis em `stats`
+## ⚙️ Technical decisions worth highlighting
 
-Você pode pedir todos os campos ou só os que quiser em `fields`.
+Some implementation decisions that make the project closer to a production-style application:
 
-Campos aceitos:
-
-- `current`
-- `average`
-- `lowest`
-- `highest`
-- `total`
-- `variation_percent`
-- `is_best_price`
-- `last_30_days_average`
-- `price_trend`
-
-### Exemplo
-
-```http
-GET /api/v1/products/1/prices/stats?fields=current,average,lowest
-```
+- secure JWT authentication using **HTTP-only cookies**;
+- CSRF protection for cookie-based authenticated actions;
+- frontend session awareness through `/auth/session`;
+- background processing with **Celery + Redis**;
+- periodic scheduling with **Celery Beat**;
+- per-product scheduling through `next_check_at`;
+- automatic price history entries only when the price changes;
+- safer worker behavior if a product disappears before task execution;
+- throttled `last_access` updates to avoid unnecessary database writes;
+- marketplace-specific scraper isolation;
+- resolver-based scraper selection by URL;
+- backend separation into routes, services, validators, and models;
+- migrations for schema evolution;
+- Docker orchestration for the complete local environment;
+- CI pipeline for automated test validation.
 
 ---
 
-## ❌ Exemplos de erros comuns
+## ❌ Common validation errors
 
-### URL inválida
-
-```json
-{
-  "error": "Invalid url"
-}
-```
-
-### Link de marketplace não suportado
+### Unsupported marketplace URL
 
 ```json
 {
@@ -448,15 +695,7 @@ GET /api/v1/products/1/prices/stats?fields=current,average,lowest
 }
 ```
 
-### Produto não encontrado
-
-```json
-{
-  "error": "product not found"
-}
-```
-
-### URL já cadastrada pelo mesmo usuário
+### Duplicate product URL for the same user
 
 ```json
 {
@@ -464,169 +703,80 @@ GET /api/v1/products/1/prices/stats?fields=current,average,lowest
 }
 ```
 
----
+### Product not found
 
-## 🧪 Rodando os testes
-
-Os testes automatizados cobrem os principais fluxos da aplicação, incluindo:
-
-- cadastro e login
-- autenticação obrigatória nas rotas protegidas
-- criação, listagem, busca, edição e remoção de produtos
-- histórico de preços
-- estatísticas e filtro por `fields`
-- isolamento de dados entre usuários
-
-### Executar testes
-
-```bash
-pytest
+```json
+{
+  "error": "product not found"
+}
 ```
 
-### Executar com mais detalhes
+### Invalid URL
 
-```bash
-pytest -v
-```
-
-### Observação
-
-O projeto também possui **CI com GitHub Actions**, executando os testes em pushes para a branch `main` e manualmente via `workflow_dispatch`.
-
----
-
-## 🗂️ Estrutura do projeto
-
-```bash
-├── .github
-│   └── workflows
-│       └── ci.yml
-├── app
-│   ├── models
-│   │   ├── price_history_model.py
-│   │   ├── product_model.py
-│   │   └── user_model.py
-│   ├── routes
-│   │   ├── auth
-│   │   │   ├── __init__.py
-│   │   │   └── auth_routes.py
-│   │   ├── price
-│   │   │   ├── __init__.py
-│   │   │   └── price_routes.py
-│   │   └── product
-│   │       ├── __init__.py
-│   │       └── product_routes.py
-│   ├── services
-│   │   ├── scrapers
-│   │   │   ├── amazon_playwright.py
-│   │   │   ├── mercado_livre_playwright.py
-│   │   │   └── scraper_resolver.py
-│   │   ├── price_service.py
-│   │   ├── price_stats.py
-│   │   ├── product_service.py
-│   │   └── user_service.py
-│   ├── utils
-│   │   └── field_validators.py
-│   ├── validators
-│   │   ├── auth_validators.py
-│   │   ├── price_validators.py
-│   │   └── product_validators.py
-│   ├── __init__.py
-│   ├── db.py
-│   └── exceptions.py
-├── migrations
-│   ├── versions
-│   │   └── *.py
-│   ├── README
-│   ├── alembic.ini
-│   ├── env.py
-│   └── script.py.mako
-├── tests
-│   ├── conftest.py
-│   ├── test_auth.py
-│   ├── test_price.py
-│   └── test_product.py
-├── .dockerignore
-├── .env.example
-├── .gitattributes
-├── .gitignore
-├── Dockerfile
-├── LICENSE
-├── README.md
-├── dev-requirements.txt
-├── docker-compose.yml
-├── pytest.ini
-├── requirements.txt
-└── run.py
+```json
+{
+  "error": "Invalid url"
+}
 ```
 
 ---
 
-## 🧱 Organização por camadas
+## 📈 MVP scope
 
-- **routes/** → define os endpoints da API
-- **services/** → concentra as regras de negócio
-- **validators/** → valida entradas e regras de formato
-- **models/** → representa as entidades persistidas no banco
-- **utils/** → funções auxiliares reutilizáveis
-- **migrations/** → versiona mudanças no banco
-- **tests/** → valida os principais comportamentos da aplicação
+The MVP v1 includes:
 
----
-
-## 🧠 Decisões de implementação
-
-Algumas decisões deixam o projeto mais próximo de um cenário real de back-end:
-
-- uso de **JWT** para autenticação
-- separação clara entre **rotas**, **serviços**, **validações** e **modelos**
-- uso de **migrations** para evoluir o schema do banco
-- scraping isolado em uma camada própria de **services/scrapers**
-- escolha do scraper com base no **hostname da URL**
-- criação automática do primeiro preço ao cadastrar um produto
-- endpoint específico para **refresh** de preço
-- proteção contra **URL duplicada por usuário**
-- suporte a execução local e com **Docker**
-- **CI com GitHub Actions**
-- **testes automatizados** para manter estabilidade
+- full-stack user flow;
+- secure authentication;
+- URL-based product tracking;
+- automatic scraping of name and price;
+- background tracking system;
+- periodic checks;
+- price history;
+- statistics;
+- responsive frontend;
+- automated tests;
+- Dockerized development environment;
+- CI.
 
 ---
 
-## 🔮 Melhorias futuras
+## 🔮 Possible future extensions
 
-Algumas evoluções que ainda podem ser adicionadas:
+These ideas are intentionally outside the MVP v1 scope:
 
-- documentação interativa com Swagger ou Postman
-- paginação na listagem de produtos
-- mocks mais robustos para scraping nos testes
-- filtros por período no histórico
-- agendamento automático de refresh de preço
-- alertas de queda de preço
-- deploy em ambiente cloud
-- logs e monitoramento mais detalhados
-
----
-
-## 🎯 Objetivo do projeto
-
-Este projeto foi desenvolvido como parte da minha evolução prática em back-end com Python.
-
-Mais do que apenas criar rotas, a ideia foi treinar conceitos importantes de aplicações reais, como:
-
-- autenticação
-- separação de responsabilidades
-- persistência de dados
-- histórico de alterações
-- scraping controlado
-- versionamento de banco
-- testes automatizados
-- execução com Docker
-- pipeline básica de CI
-
-Ele representa bem a forma como venho estudando: transformando conceitos em projetos funcionais, organizados e cada vez mais próximos de um ambiente profissional.
+- target-price alerts;
+- email or push notifications;
+- richer chart visualizations;
+- product list pagination;
+- filtering by historical periods;
+- deployment to a public cloud environment;
+- structured logging and observability;
+- support for additional marketplaces.
 
 ---
 
-## 📄 Licença
+## 🎯 Project goal
 
-Este projeto está sob a [licença MIT](./LICENSE).
+This project was developed as a practical full-stack portfolio case study.
+
+Its purpose was not only to expose endpoints, but to explore real application concerns such as:
+
+- security;
+- session management;
+- web scraping;
+- background processing;
+- scheduling;
+- data persistence;
+- historical analysis;
+- frontend integration;
+- test coverage;
+- containerized orchestration;
+- CI workflows.
+
+It represents the evolution of a backend-centered study project into a complete, production-inspired full-stack application.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
