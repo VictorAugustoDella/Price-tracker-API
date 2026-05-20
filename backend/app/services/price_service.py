@@ -44,7 +44,7 @@ def _scrape_validated_price(product: Product):
     product_url = product.url
 
     scraper, _ = get_scraper(product_url)
-    price, _ = scraper(product_url)
+    price, _ = scraper(product_url, include_name=False)
 
     return validate_scraped_price(price)
 
@@ -95,6 +95,8 @@ def track_product_price_service(product_id: int):
 
     db.session.add(product_price)
     db.session.commit()
+    
+    return product_price
     
 
 def get_due_product_ids_service():

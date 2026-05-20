@@ -24,7 +24,7 @@ def test_get_due_product_ids_service_returns_due_product(product):
 def test_track_product_price_service_does_not_save_same_price(product, monkeypatch):
     product_obj, _ = product
 
-    def fake_scraper(url):
+    def fake_scraper(url, include_name=True):
         return Decimal("43.50"), "Produto Mockado"
 
     def fake_get_scraper(url):
