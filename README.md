@@ -57,31 +57,23 @@ This project was designed as a portfolio case study focused on building a more r
 
 ## 🎥 Demo & interface previews
 
-> Replace the placeholders below with the final images, GIFs, and/or short demo videos before publishing the project as a portfolio showcase.
-
-### 🎬 Product demo GIF
-
-![Demo GIF placeholder](docs/media/demo-placeholder.gif)
+> The screenshots below show the final MVP interface running locally with sample product data.
 
 ### 🔐 Login screen
 
-![Login screen placeholder](docs/screenshots/login-placeholder.png)
+![Login screen](docs/screenshots/login.png)
 
 ### 🧾 Register screen
 
-![Register screen placeholder](docs/screenshots/register-placeholder.png)
+![Register screen](docs/screenshots/register.png)
 
 ### 📊 Dashboard
 
-![Dashboard placeholder](docs/screenshots/dashboard-placeholder.png)
+![Dashboard](docs/screenshots/dashboard.png)
 
-### 🛒 Product details
+### 🛒 Product details, price history & statistics
 
-![Product details placeholder](docs/screenshots/product-details-placeholder.png)
-
-### 📈 Price history & statistics
-
-![Statistics placeholder](docs/screenshots/stats-placeholder.png)
+![Product details](docs/screenshots/product-details.png)
 
 ---
 
