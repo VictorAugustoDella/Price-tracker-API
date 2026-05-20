@@ -27,15 +27,32 @@ _INVALID_PAGE_SIGNALS = (
     "verifique que você é humano",
 )
 
+_LOGIN_WALL_SIGNALS = (
+    "olá! para continuar, acesse",
+    "sou novo",
+    "já tenho conta",
+)
 
+
+def _wait_for_body_text(page) -> None:
+    try:
+        page.wait_for_function(
+            "() => document.body && document.body.innerText.trim().length > 0",
+            timeout=5_000,
+        )
+    except PlaywrightTimeoutError:
+        pass
 
 
 def _detect_invalid_page(page) -> None:
-    
     title = page.title().lower()
 
     try:
-        body_preview = page.locator("body").inner_text(timeout=_ELEMENT_TIMEOUT).lower()[:2500]
+        body_preview = (
+            page.locator("body")
+            .inner_text(timeout=_ELEMENT_TIMEOUT)
+            .lower()[:2500]
+        )
     except PlaywrightTimeoutError:
         body_preview = ""
 
@@ -47,6 +64,10 @@ def _detect_invalid_page(page) -> None:
                 "Mercado Livre returned an unexpected or blocked page."
             )
 
+    if all(signal in searchable_content for signal in _LOGIN_WALL_SIGNALS):
+        raise ValidationError(
+            "Mercado Livre blocked automated access or requires login for this page."
+        )
 
 def _get_visible_text_or_none(page, selector: str) -> str | None:
     
@@ -296,14 +317,18 @@ def _price_from_text_near_title(page, scraped_name: str) -> str | None:
     return candidate_prices[-1]
 
 
-def _extract_price(page, scraped_name: str) -> str:
+def _extract_price(page, scraped_name: str | None = None) -> str:
     
     strategies = [
         lambda: _price_from_json_ld(page),
         lambda: _price_from_meta(page),
         lambda: _price_from_main_price_dom(page),
-        lambda: _price_from_text_near_title(page, scraped_name),
     ]
+
+    if scraped_name:
+        strategies.append(
+            lambda: _price_from_text_near_title(page, scraped_name)
+        )
 
     for strategy in strategies:
         price = strategy()
@@ -331,7 +356,10 @@ def _extract_name(page) -> str:
 
 
 
-def ml_scraper_price(link: str) -> tuple[str, str]:
+def ml_scraper_price(
+    link: str,
+    include_name: bool = True
+) -> tuple[str, str | None]:
     if not link.startswith(("http://", "https://")):
         link = f"https://{link}"
 
@@ -361,9 +389,10 @@ def ml_scraper_price(link: str) -> tuple[str, str]:
                     "Mercado Livre page timed out while loading."
                 )
 
+            _wait_for_body_text(page)
             _detect_invalid_page(page)
 
-            scraped_name = _extract_name(page)
+            scraped_name = _extract_name(page) if include_name else None
             price = _extract_price(page, scraped_name)
 
             return price, scraped_name

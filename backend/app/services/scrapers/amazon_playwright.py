@@ -99,7 +99,10 @@ def _extract_name(page) -> str:
 
 
 
-def amazon_scraper_price(link: str) -> tuple[str, str]:
+def amazon_scraper_price(
+    link: str,
+    include_name: bool = True
+) -> tuple[str, str | None]:
     
     if not link.startswith(("http://", "https://")):
         link = f"https://{link}"
@@ -144,7 +147,7 @@ def amazon_scraper_price(link: str) -> tuple[str, str]:
                 )
 
             price = _extract_price(page)
-            scraped_name = _extract_name(page)
+            scraped_name = _extract_name(page) if include_name else None
 
             return price, scraped_name
 
