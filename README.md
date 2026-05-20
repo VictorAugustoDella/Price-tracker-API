@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  <strong>Project status:</strong> ✅ MVP v1 feature complete
+  <strong>Project status:</strong> ✅ MVP v1 complete
 </p>
 
 ---
@@ -302,6 +302,8 @@ Currently, Price Tracker supports product URLs from:
 
 If a URL does not belong to a supported marketplace, the backend returns a validation error.
 
+> Note: Mercado Livre may occasionally block automated access or require login. When this happens, the application returns a clear scraping error instead of failing silently or showing a misleading product parsing error.
+
 ---
 
 ## 📡 API endpoints
@@ -579,6 +581,8 @@ The project also includes a **GitHub Actions CI pipeline** that validates the te
 │       └── ci.yml
 ├── backend/
 │   ├── app/
+│   │   ├── config/
+│   │   │   └── settings.py
 │   │   ├── models/
 │   │   │   ├── price_history_model.py
 │   │   │   ├── product_model.py
@@ -594,16 +598,17 @@ The project also includes a **GitHub Actions CI pipeline** that validates the te
 │   │   │   ├── product_service.py
 │   │   │   └── user_service.py
 │   │   ├── utils/
-│   │   │   └── activity.py
+│   │   │   ├── activity.py
+│   │   │   └── field_validators.py
 │   │   ├── validators/
 │   │   │   ├── auth_validators.py
 │   │   │   ├── price_validators.py
 │   │   │   └── product_validators.py
-│   │   ├── celery_app.py
-│   │   ├── tasks.py
 │   │   ├── __init__.py
+│   │   ├── celery_app.py
 │   │   ├── db.py
-│   │   └── exceptions.py
+│   │   ├── exceptions.py
+│   │   └── tasks.py
 │   ├── migrations/
 │   ├── tests/
 │   │   ├── conftest.py
@@ -612,11 +617,17 @@ The project also includes a **GitHub Actions CI pipeline** that validates the te
 │   │   ├── test_price_tracking.py
 │   │   └── test_product.py
 │   ├── Dockerfile
-│   ├── make_celery.py
-│   ├── requirements.txt
 │   ├── dev-requirements.txt
+│   ├── make_celery.py
 │   ├── pytest.ini
+│   ├── requirements.txt
 │   └── run.py
+├── docs/
+│   └── screenshots/
+│       ├── dashboard.png
+│       ├── login.png
+│       ├── product-details.png
+│       └── register.png
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
