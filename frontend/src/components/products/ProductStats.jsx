@@ -39,10 +39,10 @@ function ProductStats({ stats }) {
 
   function valueClass(field, value) {
     if (field === "variation_percent" && typeof value === "number") {
-      if (value > 0) return "text-destructive";
-      if (value < 0) return "text-success";
+      if (value > 0) return "text-[oklch(0.78_0.18_22)]";
+      if (value < 0) return "text-[oklch(0.78_0.17_158)]";
     }
-    if (field === "is_best_price" && value) return "text-success";
+    if (field === "is_best_price" && value) return "text-[oklch(0.78_0.17_158)]";
     return "text-foreground";
   }
 
@@ -50,18 +50,18 @@ function ProductStats({ stats }) {
 
   return (
     <section className="card-base p-5 sm:p-6 animate-[slide-up_0.5s_ease-out_both]">
-      <h3 className="text-sm font-semibold text-foreground mb-4">Estatísticas</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-4 tracking-tight">Estatísticas</h3>
       {hasStats ? (
         <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
           {Object.entries(stats).map(([field, value]) => (
             <div
               key={field}
-              className="rounded-md border border-border bg-muted/40 px-4 py-3 transition-colors hover:bg-muted"
+              className="relative rounded-lg border border-white/[0.06] bg-white/[0.025] px-4 py-3.5 transition-all hover:bg-white/[0.05] hover:border-primary/25"
             >
-              <dt className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
+              <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
                 {statsLabels[field] || field}
               </dt>
-              <dd className={`mt-1 text-lg font-semibold tabular-nums ${valueClass(field, value)}`}>
+              <dd className={`mt-1.5 text-lg font-semibold tabular-nums ${valueClass(field, value)}`}>
                 {formatStatValue(field, value)}
               </dd>
             </div>

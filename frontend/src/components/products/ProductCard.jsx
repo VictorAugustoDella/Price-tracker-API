@@ -3,9 +3,11 @@ import { formatDate } from "../../utils/formatters";
 
 function ProductCard({ product, onDelete, onUpdate }) {
   return (
-    <li className="card-base p-5 flex flex-col gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)] animate-[slide-up_0.4s_ease-out_both]">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
+    <li className="card-base group relative p-5 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated)] hover:border-primary/30 animate-[slide-up_0.4s_ease-out_both] overflow-hidden">
+      {/* Hover gradient halo */}
+      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(ellipse_at_top_right,_oklch(0.66_0.22_295/0.10),_transparent_60%)]" />
+
+      <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-foreground leading-snug truncate">
             {product.product}
@@ -19,33 +21,30 @@ function ProductCard({ product, onDelete, onUpdate }) {
         {product.site && <span className="badge shrink-0">{product.site}</span>}
       </div>
 
-      {/* External link */}
       <a
         href={product.url}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-hover transition-colors w-fit"
+        className="relative inline-flex items-center gap-1.5 text-xs font-medium text-gradient hover:opacity-80 transition-opacity w-fit"
       >
         Abrir produto
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="oklch(0.66 0.22 295)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M7 17L17 7" /><path d="M8 7h9v9" />
         </svg>
       </a>
 
-      {/* Meta */}
-      <dl className="grid grid-cols-2 gap-3 text-xs border-t border-border pt-4">
+      <dl className="relative grid grid-cols-2 gap-3 text-xs border-t border-white/[0.06] pt-4">
         <div>
-          <dt className="text-muted-foreground">Adicionado</dt>
-          <dd className="mt-0.5 text-foreground font-medium">{formatDate(product.added_at)}</dd>
+          <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Adicionado</dt>
+          <dd className="mt-1 text-foreground font-medium">{formatDate(product.added_at)}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">Última mudança</dt>
-          <dd className="mt-0.5 text-foreground font-medium">{formatDate(product.last_change)}</dd>
+          <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Última mudança</dt>
+          <dd className="mt-1 text-foreground font-medium">{formatDate(product.last_change)}</dd>
         </div>
       </dl>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 pt-1 mt-auto">
+      <div className="relative flex items-center gap-2 pt-1 mt-auto">
         <Link
           to={`/products/${product.id}`}
           className="btn btn-primary flex-1 !py-2 text-sm"
