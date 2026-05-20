@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <div>
+    <div className="app-shell text-foreground">
       <Navbar />
 
       <Routes>

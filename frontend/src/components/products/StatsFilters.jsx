@@ -6,17 +6,17 @@ function StatsFilters({
 }) {
   return (
     <section className="card-base p-5 sm:p-6 animate-[slide-up_0.4s_ease-out_both]">
-      <h3 className="text-sm font-semibold text-foreground mb-4">Métricas</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-4 tracking-tight">Métricas</h3>
       <div className="space-y-2 mb-5">
         {statsOptions.map((option) => {
           const checked = selectedStatsFields.includes(option.value);
           return (
             <label
               key={option.value}
-              className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+              className={`flex items-center gap-3 rounded-md border px-3 py-2.5 cursor-pointer transition-all ${
                 checked
-                  ? "border-primary/40 bg-accent-soft"
-                  : "border-border hover:bg-muted/60"
+                  ? "border-primary/40 bg-gradient-to-r from-primary/15 to-accent/10 shadow-[0_0_0_1px_oklch(0.62_0.20_268/0.25)]"
+                  : "border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
               }`}
             >
               <input
