@@ -425,7 +425,7 @@ Create a `.env` file in the project root using `.env.example` as a starting poin
 ```env
 SECRET_KEY=change-me
 JWT_SECRET_KEY=change-me-too
-DATABASE_URL=postgresql+psycopg2://project:project@db:5432/project
+DATABASE_URL=postgresql+psycopg2://project:change-me@db:5432/project
 
 POSTGRES_USER=project
 POSTGRES_PASSWORD=change-me
